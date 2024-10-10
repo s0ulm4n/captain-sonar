@@ -9,18 +9,12 @@ import { GRID_SIZE, GridCell } from "../../shared/constants.mjs";
  */
 class GameState {
     constructor() {
+        // Whether the sub is submerged or surfaced
+        this.isSurfaced = false;
+
         // The game area
         this.grid = Array.from({ length: GRID_SIZE }, () =>
             new Array(GRID_SIZE).fill(GridCell.EMPTY));
-
-        // Sprinkle in some random islands, staying away from the edges of the grid
-        for (let i = 2; i < GRID_SIZE - 2; i++) {
-            for (let j = 2; j < GRID_SIZE - 2; j++) {
-                if (Math.floor(Math.random * 10) <= 1) {
-                    this.grid[i][j] = GridCell.LAND;
-                }
-            }
-        }
 
         // Position of the sub on the grid
         this.subPosition = {
@@ -28,8 +22,18 @@ class GameState {
             y: 7,
         };
 
-        // Whether the sub is submerged or surfaced
-        this.isSurfaced = false;
+        // Sprinkle in some random islands, staying away from the edges of the grid
+        for (let y = 2; y < GRID_SIZE - 2; y++) {
+            for (let x = 2; x < GRID_SIZE - 2; x++) {
+                if (
+                    // Make sure to not put an island on top of the sub!
+                    !(this.subPosition.y === y && this.subPosition.x === x)
+                    && (Math.floor(Math.random() * 10) <= 1)
+                ) {
+                    this.grid[y][x] = GridCell.LAND;
+                }
+            }
+        }
     }
 
     /**
@@ -47,6 +51,16 @@ class GameState {
      * @returns {TryMoveSubResponse}
      */
     tryMoveSub = (dx, dy) => {
+        // Can't move if surfaced
+        if (this.isSurfaced) {
+            // throw?
+            return {
+                success: false,
+                newSubPosition: null,
+                message: "Can't move when surfaced!"
+            }
+        }
+
         // Truncate the input just in case
         dx = Math.trunc(dx);
         dy = Math.trunc(dy);
@@ -75,28 +89,27 @@ class GameState {
             }
         }
 
-        // We also can't move if surfaced
-        if (this.isSurfaced) {
-            // throw?
+        const oldSubPos = this.subPosition;
+        const newSubPos = {
+            x: oldSubPos.x + dx,
+            y: oldSubPos.y + dy,
+        }
+
+        // Don't fall off the map
+        if (newSubPos.x < 0 || newSubPos.x >= GRID_SIZE || newSubPos.y < 0 || newSubPos.y >= GRID_SIZE) {
             return {
                 success: false,
                 newSubPosition: null,
-                message: "Can't move when surfaced!"
+                message: "Can't move beyond the edge of the grid!",
             }
         }
 
-        const oldSubPos = this.subPosition;
-        const newSubPos = {
-            x: this.subPosition.x + dx,
-            y: this.subPosition.y + dy,
-        }
-
+        // Can't move into cells that aren't empty
         if (this.grid[newSubPos.y][newSubPos.x] !== GridCell.EMPTY) {
-            // Can't go there
             return {
                 success: false,
                 newSubPosition: null,
-                message: "Destination cell isn't not empty: " + this.grid[newSubPos.y][newSubPos.x],
+                message: "Destination cell is not empty: " + this.grid[newSubPos.y][newSubPos.x],
             }
         }
 

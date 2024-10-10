@@ -1,3 +1,0 @@
-# Captain Sonar
-
-Coming soon...
