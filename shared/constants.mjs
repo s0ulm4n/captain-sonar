@@ -15,6 +15,7 @@ export const GridCell = Object.freeze({
 
 // List of socket communication events
 export const SocketEvents = Object.freeze({
+    updateTeamId: "updateTeamId",
     updateGameState: "updateGameState",
     tryMoveSub: "tryMoveSub",
     surface: "surface",

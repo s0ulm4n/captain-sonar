@@ -12,4 +12,6 @@ Milestones:
 
 ~~4) Fully functioning movement + surfacing controls: movement leaves trace, surfacing erases it.~~
 
-5) Placing connecting players into one of two teams. Making communication between server and client team-aware.
+~~5) Placing connecting players into one of two teams. Making communication between server and client team-aware.~~
+
+6) Adding partial implementation of the Engineer systems and UI. No separate player roles yet.

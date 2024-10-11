@@ -14,44 +14,70 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
 });
 
+const players = {};
+const teamSizes = [0, 0];
+
 /* Initialize game state */
 const gameState = new GameState();
 
 io.on("connection", (socket) => {
     console.log("User connected: ", socket.id);
 
-    socket.on(SocketEvents.tryMoveSub, (dx, dy) => {
-        console.log("caught tryMoveSub event!");
-        const result = gameState.tryMoveSub(dx, dy);
+    // Put the player into one of the teams 
+    // based on which one has more active players
+    const team = teamSizes[0] > teamSizes[1] ? 1 : 0;
+    teamSizes[team]++;
+
+    const newPlayer = {
+        id: socket.id,
+        teamId: team,
+    };
+    players[socket.id] = newPlayer;
+    console.log("Players:");
+    console.log(players);
+
+    // Emit the "updateTeamId" and "updateGameState" events 
+    // only to the player who just joined
+    io.to(socket.id).emit(SocketEvents.updateTeamId, newPlayer.teamId);
+    io.to(socket.id).emit(SocketEvents.updateGameState, gameState);
+
+    socket.on(SocketEvents.tryMoveSub, (teamId, dx, dy) => {
+        console.log("Received trySubMove event from team " + teamId);
+        const result = gameState.tryMoveSub(teamId, dx, dy);
         if (result.success) {
-            console.log("Emitting new game state!");
             io.emit(SocketEvents.updateGameState, gameState);
         } else {
             console.log(result.message);
         }
     });
 
-    socket.on(SocketEvents.submerge, () => {
-        const result = gameState.submerge();
+    socket.on(SocketEvents.submerge, (teamId) => {
+        console.log("Received submerge event from team " + teamId);
+        const result = gameState.submerge(teamId);
         if (result) {
-            console.log("Emitting new game state!");
             io.emit(SocketEvents.updateGameState, gameState);
         }
     });
 
-    socket.on(SocketEvents.surface, () => {
-        const result = gameState.surface();
+    socket.on(SocketEvents.surface, (teamId) => {
+        console.log("Received surface event from team " + teamId);
+        const result = gameState.surface(teamId);
         if (result) {
-            console.log("Emitting new game state!");
             io.emit(SocketEvents.updateGameState, gameState);
         }
     });
-
-    io.emit(SocketEvents.updateGameState, gameState);
 
     socket.on("disconnect", () => {
-        console.log("User disconnected");
-    })
+        const player = players[socket.id];
+        if (player) {
+            const teamId = player.teamId;
+            teamSizes[teamId]--;
+        }
+        delete players[socket.id];
+        console.log("User disconnected: ", socket.id);
+        console.log("Players:");
+        console.log(players);
+    });
 });
 
 server.listen(port, () => {

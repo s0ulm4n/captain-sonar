@@ -1,39 +1,36 @@
 import PropTypes from "prop-types";
 
-import { GRID_SIZE, GridCell } from "../../../shared/constants.mjs";
+import { GRID_SIZE } from "../../../shared/constants.mjs";
 
-const Grid = ({ grid, subPosition }) => {
+const Grid = ({ grid, subPosition, subRoute }) => {
     let output = [];
+
+    // console.log("Rendering grid");
+    // console.log(grid);
+    // console.log(subPosition);
 
     if (grid && subPosition) {
         for (let y = 0; y < GRID_SIZE; y++) {
-            let line = "";
+            let line = [];
 
             for (let x = 0; x < GRID_SIZE; x++) {
-                if (y === subPosition.y && x === subPosition.x) {
-                    line += '@';
-                } else {
-                    switch (grid[y][x]) {
-                        case GridCell.EMPTY:
-                            line += '.';
-                            break;
-                        case GridCell.LAND:
-                            line += '^';
-                            break;
-                        case GridCell.PATH:
-                            line += 'x';
-                            break;
-                        case GridCell.MINE:
-                            line += 'M';
-                            break;
-                        default:
-                            line += '?';
+                {
+                    if (grid[y][x]) {
+                        line.push('^');
+                    } else {
+                        line.push('.');
                     }
                 }
             }
 
             output.push(line);
         }
+
+        subRoute.forEach(cell => {
+            output[cell.y][cell.x] = 'x';
+        });
+
+        output[subPosition.y][subPosition.x] = '@';
     }
 
     return (
@@ -48,6 +45,7 @@ const Grid = ({ grid, subPosition }) => {
 Grid.propTypes = {
     grid: PropTypes.array,
     subPosition: PropTypes.object,
+    subRoute: PropTypes.array,
 }
 
 export default Grid;
