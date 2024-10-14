@@ -1,20 +1,27 @@
 import express from "express";
-import http from "http";
+import { createServer } from "http";
 import { Server } from "socket.io";
-import { SocketEvents } from "../../shared/constants.mjs";
-import GameState from "./GameState.js";
+import { SocketEvents } from "../../shared/enums.js";
+import GameState from "./game/GameState.js";
 
 /* Setup the server and init socket.io */
 const port = process.env.APP_PORT || 4000;
 
 const app = express();
-const server = http.createServer(app);
+const server = createServer(app);
 const io = new Server(server, {
-    origin: "http://localhost:3010",
-    methods: ["GET", "POST"],
+    cors: {
+        origin: "http://localhost:3010",
+        methods: ["GET", "POST"],
+    }
 });
 
-const players = {};
+const players: {
+    [id: string]: {
+        id: string,
+        teamId: number,
+    };
+} = {};
 const teamSizes = [0, 0];
 
 /* Initialize game state */
@@ -41,7 +48,7 @@ io.on("connection", (socket) => {
     io.to(socket.id).emit(SocketEvents.updateTeamId, newPlayer.teamId);
     io.to(socket.id).emit(SocketEvents.updateGameState, gameState);
 
-    socket.on(SocketEvents.tryMoveSub, (teamId, dx, dy) => {
+    socket.on(SocketEvents.tryMoveSub, (teamId: number, dx: number, dy: number) => {
         console.log("Received trySubMove event from team " + teamId);
         const result = gameState.tryMoveSub(teamId, dx, dy);
         if (result.success) {
@@ -51,7 +58,7 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on(SocketEvents.submerge, (teamId) => {
+    socket.on(SocketEvents.submerge, (teamId: number) => {
         console.log("Received submerge event from team " + teamId);
         const result = gameState.submerge(teamId);
         if (result) {
@@ -59,7 +66,7 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on(SocketEvents.surface, (teamId) => {
+    socket.on(SocketEvents.surface, (teamId: number) => {
         console.log("Received surface event from team " + teamId);
         const result = gameState.surface(teamId);
         if (result) {
