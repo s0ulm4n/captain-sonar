@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
-import './App.css'
+import './App.css';
+import { IGameState } from "../../shared/interfaces";
 import Grid from "./components/Grid";
 import MovementControls from "./components/MovementControls";
-import { SocketEvents } from "../../shared/constants.mjs";
+import { SocketEvents } from "../../shared/enums";
 import SurfacingControls from "./components/SurfacingControls";
-import { socket } from "./socket.js";
+import { socket } from "./main";
 
 const App = () => {
-  const [gameState, setGameState] = useState({
-    grid: null,
+  const [gameState, setGameState] = useState<IGameState>({
+    grid: [],
     teams: [],
   });
-  const [teamId, setTeamId] = useState(-1);
+  const [teamId, setTeamId] = useState<number>(-1);
 
   // This will run once after the main component mounts.
   // In dev mode, the main component is mounted, unmounted, then mounted again.
@@ -22,26 +23,26 @@ const App = () => {
 
     socket.on("connect", () => {
       console.log("Connected to server");
-    })
+    });
 
     // This will run once the main component is unmounted, ensuring that we
     // close the connection.
     return () => {
       console.log("Disconnecting from server");
       socket.disconnect();
-    }
+    };
   }, []);
 
   useEffect(() => {
-    const onUpdateTeamId = (teamId) => {
+    const onUpdateTeamId = (teamId: 0 | 1) => {
       console.log("Client received teamId: " + teamId);
       setTeamId(teamId);
-    }
-    const onUpdateGameState = (gameState) => {
+    };
+    const onUpdateGameState = (gameState: IGameState) => {
       console.log("Client received game state:");
       console.log(gameState);
       setGameState(gameState);
-    }
+    };
 
     socket.on(SocketEvents.updateTeamId, onUpdateTeamId);
     socket.on(SocketEvents.updateGameState, onUpdateGameState);
@@ -66,7 +67,7 @@ const App = () => {
           null
       }
       <MovementControls onClick={(dx, dy) => {
-        socket.emit(SocketEvents.tryMoveSub, teamId, dx, dy)
+        socket.emit(SocketEvents.tryMoveSub, teamId, dx, dy);
       }} />
       <SurfacingControls
         isSurfaced={gameState.teams[teamId] ? gameState.teams[teamId].isSurfaced : false}
@@ -75,6 +76,6 @@ const App = () => {
       />
     </>
   );
-}
+};
 
 export default App;

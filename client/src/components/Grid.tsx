@@ -1,8 +1,14 @@
-import PropTypes from "prop-types";
+import { GRID_SIZE } from "../../../shared/constants.mts";
+import type { Point } from "../../../shared/types";
+import { GridCell } from "../../../shared/enums";
 
-import { GRID_SIZE } from "../../../shared/constants.mjs";
+type Props = {
+    grid: GridCell[][],
+    subPosition: Point,
+    subRoute: Point[],
+};
 
-const Grid = ({ grid, subPosition, subRoute }) => {
+const Grid = ({ grid, subPosition, subRoute }: Props) => {
     let output = [];
 
     // console.log("Rendering grid");
@@ -15,7 +21,7 @@ const Grid = ({ grid, subPosition, subRoute }) => {
 
             for (let x = 0; x < GRID_SIZE; x++) {
                 {
-                    if (grid[y][x]) {
+                    if (grid[y][x] === GridCell.Land) {
                         line.push('^');
                     } else {
                         line.push('.');
@@ -41,11 +47,5 @@ const Grid = ({ grid, subPosition, subRoute }) => {
         </div>
     );
 };
-
-Grid.propTypes = {
-    grid: PropTypes.array,
-    subPosition: PropTypes.object,
-    subRoute: PropTypes.array,
-}
 
 export default Grid;

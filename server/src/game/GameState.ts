@@ -1,4 +1,3 @@
-// import { GRID_SIZE, GridCell } from "../../../shared/constants.js";
 import { GRID_SIZE } from "../../../shared/constants.mjs";
 import { GridCell } from "../../../shared/enums.js";
 import ClientState from "./ClientState.js";
@@ -39,7 +38,7 @@ class GameState {
      */
     tryMoveSub(teamId: number, dx: number, dy: number): {
         success: boolean,
-        newSubPosition: Point,
+        newSubPosition: Point | null,
         message: string,
     } {
         console.log("tryMoveSub called: teamId=", teamId, "; dx: ", dx, "; dy: ", dy);

@@ -1,6 +1,8 @@
-import PropTypes from "prop-types";
+type Props = {
+    onClick: (dx: number, dy: number) => void,
+};
 
-const MovementControls = ({ onClick }) => {
+const MovementControls = ({ onClick }: Props) => {
     return (
         <>
             <div>
@@ -24,9 +26,5 @@ const MovementControls = ({ onClick }) => {
         </>
     );
 };
-
-MovementControls.propTypes = {
-    onClick: PropTypes.func.isRequired,
-}
 
 export default MovementControls;
