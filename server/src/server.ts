@@ -1,7 +1,7 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { SocketEvents } from "../../shared/enums.js";
+import { Direction, SocketEvents } from "../../shared/enums.mjs";
 import GameState from "./game/GameState.js";
 
 /* Setup the server and init socket.io */
@@ -48,29 +48,60 @@ io.on("connection", (socket) => {
     io.to(socket.id).emit(SocketEvents.updateTeamId, newPlayer.teamId);
     io.to(socket.id).emit(SocketEvents.updateGameState, gameState);
 
-    socket.on(SocketEvents.tryMoveSub, (teamId: number, dx: number, dy: number) => {
-        console.log("Received trySubMove event from team " + teamId);
-        const result = gameState.tryMoveSub(teamId, dx, dy);
-        if (result.success) {
-            io.emit(SocketEvents.updateGameState, gameState);
-        } else {
-            console.log(result.message);
+    socket.on(SocketEvents.tryMoveSub, (teamId: number, dir: Direction) => {
+        const team = gameState.teams[teamId];
+
+        if (team) {
+            console.log("Received trySubMove event from team " + teamId);
+
+            const result = team.tryMoveSub(gameState.grid, dir);
+            if (result.success) {
+                io.emit(SocketEvents.updateGameState, gameState);
+            } else {
+                console.log(result.message);
+            }
         }
     });
 
     socket.on(SocketEvents.submerge, (teamId: number) => {
-        console.log("Received submerge event from team " + teamId);
-        const result = gameState.submerge(teamId);
-        if (result) {
-            io.emit(SocketEvents.updateGameState, gameState);
+        const team = gameState.teams[teamId];
+
+        if (team) {
+            console.log("Received submerge event from team " + teamId);
+            const result = team.submerge();
+            if (result) {
+                io.emit(SocketEvents.updateGameState, gameState);
+            }
         }
     });
 
     socket.on(SocketEvents.surface, (teamId: number) => {
-        console.log("Received surface event from team " + teamId);
-        const result = gameState.surface(teamId);
-        if (result) {
-            io.emit(SocketEvents.updateGameState, gameState);
+        const team = gameState.teams[teamId];
+
+        if (team) {
+            console.log("Received surface event from team " + teamId);
+            const result = team.surface();
+            if (result) {
+                io.emit(SocketEvents.updateGameState, gameState);
+            }
+        }
+    });
+
+    socket.on(SocketEvents.breakSystemNode, (
+        teamId: number,
+        dir: Direction,
+        systemNodeId: number
+    ) => {
+        const team = gameState.teams[teamId];
+
+        if (team) {
+            console.log("Received break system node event from team " + teamId);
+            const result = team.breakSystemNode(dir, systemNodeId);
+            if (result.success) {
+                io.emit(SocketEvents.updateGameState, gameState);
+            } else {
+                console.log(result.message);
+            }
         }
     });
 

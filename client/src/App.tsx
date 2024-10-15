@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import './App.css';
-import { IGameState } from "../../shared/interfaces";
+import { IGameState } from "../../shared/interfaces.mts";
 import Grid from "./components/Grid";
 import MovementControls from "./components/MovementControls";
-import { SocketEvents } from "../../shared/enums";
+import { Direction, SocketEvents } from "../../shared/enums.mts";
 import SurfacingControls from "./components/SurfacingControls";
 import { socket } from "./main";
+import EngineerBoard from "./components/EngineerBoard";
 
 const App = () => {
   const [gameState, setGameState] = useState<IGameState>({
@@ -51,10 +52,25 @@ const App = () => {
       socket.off(SocketEvents.updateTeamId, onUpdateTeamId);
       socket.off(SocketEvents.updateGameState, onUpdateGameState);
     };
-  }, [teamId, gameState]);
+    // }, [teamId, gameState]);
+  }, []);
 
   return (
     <>
+      <>
+        {
+          gameState.teams[teamId] ?
+            <EngineerBoard
+              nodeGroups={gameState.teams[teamId].engSystemNodeGroups}
+              onClick={
+                (dir: Direction, id: number) =>
+                  socket.emit(SocketEvents.breakSystemNode, teamId, dir, id)
+              }
+            />
+            :
+            null
+        }
+      </>
       <div>You&apos;re on team {teamId + 1}</div>
       {
         gameState.teams[teamId] ?
@@ -66,8 +82,8 @@ const App = () => {
           :
           null
       }
-      <MovementControls onClick={(dx, dy) => {
-        socket.emit(SocketEvents.tryMoveSub, teamId, dx, dy);
+      <MovementControls onClick={(dir: Direction) => {
+        socket.emit(SocketEvents.tryMoveSub, teamId, dir);
       }} />
       <SurfacingControls
         isSurfaced={gameState.teams[teamId] ? gameState.teams[teamId].isSurfaced : false}

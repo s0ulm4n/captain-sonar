@@ -14,4 +14,6 @@ Milestones:
 
 ~~5) Placing connecting players into one of two teams. Making communication between server and client team-aware.~~
 
-6) Adding partial implementation of the Engineer systems and UI. No separate player roles yet.
+~~6) Adding partial implementation of the Engineer systems and UI. No separate player roles yet.~~
+
+7) Connect movement with engineering systems: every time a move is attempted, you need to click on an engineering node before the sub actually moves.

@@ -8,3 +8,15 @@
 .grid-line {
   font-family: "Courier New";
 }
+
+.circuit-1 {
+  background-color: khaki;
+}
+
+.circuit-2 {
+  background-color: orange;
+}
+
+.circuit-3 {
+  background-color: gray;
+}
