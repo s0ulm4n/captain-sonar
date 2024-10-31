@@ -6,11 +6,11 @@ type Props = {
 
 const SurfacingControls = ({ isSurfaced, onSurfaceClick, onSubmergeClick }: Props) => {
     return isSurfaced ? (
-        <button onClick={onSubmergeClick}>
+        <button className="surface-button" onClick={onSubmergeClick}>
             Submerge
         </button>
     ) : (
-        <button onClick={onSurfaceClick}>
+        <button className="surface-button" onClick={onSurfaceClick}>
             Surface
         </button>
     );

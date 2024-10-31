@@ -10,7 +10,7 @@ type Props = {
 };
 
 const EngineerSystemNode = ({ id, group, system, isBroken, circuit = null, onClick }: Props) => {
-    const text = !isBroken ? <>{system + " " + circuit}</> : <s>{system + " " + circuit}</s>;
+    const text = !isBroken ? <>{system}</> : <s>{system}</s>;
 
     let buttonClass = "";
     switch (circuit) {
@@ -23,6 +23,8 @@ const EngineerSystemNode = ({ id, group, system, isBroken, circuit = null, onCli
         case 3:
             buttonClass = "circuit-3";
             break;
+        default:
+            buttonClass = "circuit-none";
     }
 
     return (

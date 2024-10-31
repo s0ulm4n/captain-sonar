@@ -39,14 +39,17 @@ class ClientState implements IClientState {
         success: boolean,
         message: string,
     } {
+        let response;
         console.log("tryMoveSub called: teamId=", this.teamId, "; dir: ", dir);
 
         // Can't move if surfaced
         if (this.isSurfaced) {
-            return {
+            response = {
                 success: false,
                 message: "Can't move when surfaced!",
             };
+            console.log(response);
+            return response;
         }
 
         let dx = 0;
@@ -77,30 +80,37 @@ class ClientState implements IClientState {
             newSubPos.x < 0 || newSubPos.x >= GRID_SIZE
             || newSubPos.y < 0 || newSubPos.y >= GRID_SIZE
         ) {
-            return {
+            response = {
                 success: false,
                 message: "Can't move beyond the edge of the grid!",
             };
+            console.log(response);
+            return response;
         }
 
         const { isValid, message } = this.isValidMove(grid, newSubPos);
 
         if (isValid) {
-            return {
+            this.moveSub(newSubPos);
+
+            response = {
                 success: true,
                 message: "",
             };
         } else {
-            return {
+            response = {
                 success: false,
                 message: message,
             };
         }
+        console.log(response);
+        return response;
     };
 
     // Actually move the sub.
     moveSub(newSubPos: Point): void {
-        this.subRoute.push(newSubPos);
+        this.subRoute.push(this.subPosition);
+        console.log(this.subRoute);
         this.subPosition = newSubPos;
     };
 

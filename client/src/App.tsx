@@ -56,8 +56,8 @@ const App = () => {
   }, []);
 
   return (
-    <>
-      <>
+    <div className="main-div">
+      <div className="eng-board">
         {
           gameState.teams[teamId] ?
             <EngineerBoard
@@ -70,27 +70,29 @@ const App = () => {
             :
             null
         }
-      </>
-      <div>You&apos;re on team {teamId + 1}</div>
-      {
-        gameState.teams[teamId] ?
-          <Grid
-            grid={gameState.grid}
-            subPosition={gameState.teams[teamId].subPosition}
-            subRoute={gameState.teams[teamId].subRoute}
-          />
-          :
-          null
-      }
-      <MovementControls onClick={(dir: Direction) => {
-        socket.emit(SocketEvents.tryMoveSub, teamId, dir);
-      }} />
-      <SurfacingControls
-        isSurfaced={gameState.teams[teamId] ? gameState.teams[teamId].isSurfaced : false}
-        onSurfaceClick={() => socket.emit(SocketEvents.surface, teamId)}
-        onSubmergeClick={() => socket.emit(SocketEvents.submerge, teamId)}
-      />
-    </>
+      </div>
+      <div className="move-grid">
+        <div>You&apos;re on team {teamId + 1}</div>
+        {
+          gameState.teams[teamId] ?
+            <Grid
+              grid={gameState.grid}
+              subPosition={gameState.teams[teamId].subPosition}
+              subRoute={gameState.teams[teamId].subRoute}
+            />
+            :
+            null
+        }
+        <MovementControls onClick={(dir: Direction) => {
+          socket.emit(SocketEvents.tryMoveSub, teamId, dir);
+        }} />
+        <SurfacingControls
+          isSurfaced={gameState.teams[teamId] ? gameState.teams[teamId].isSurfaced : false}
+          onSurfaceClick={() => socket.emit(SocketEvents.surface, teamId)}
+          onSubmergeClick={() => socket.emit(SocketEvents.submerge, teamId)}
+        />
+      </div>
+    </div>
   );
 };
 

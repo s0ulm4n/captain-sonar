@@ -9,10 +9,6 @@ type Props = {
 };
 
 const EngineerSystemNodeGroup = ({ group, nodes, onClick }: Props) => {
-    console.log("EngineerSystemNodeGroup");
-    console.log(group);
-    console.log(nodes);
-
     const row1 = [];
     const row2 = [];
     for (let i = 0; i <= 2; i++) {

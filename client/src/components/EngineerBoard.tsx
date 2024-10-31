@@ -10,14 +10,9 @@ type Props = {
 };
 
 const EngineerBoard = ({ nodeGroups, onClick }: Props) => {
-    console.log("EngineerBoard");
-    console.log(nodeGroups);
     const components = [];
 
     for (const dir in Direction) {
-        console.log("Rendering node group: ", dir);
-        console.log(nodeGroups[dir]);
-
         components.push(
             <EngineerSystemNodeGroup
                 group={dir as Direction}

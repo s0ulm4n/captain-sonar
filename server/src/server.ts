@@ -49,11 +49,10 @@ io.on("connection", (socket) => {
     io.to(socket.id).emit(SocketEvents.updateGameState, gameState);
 
     socket.on(SocketEvents.tryMoveSub, (teamId: number, dir: Direction) => {
+        console.log("Received trySubMove event from team " + teamId);
         const team = gameState.teams[teamId];
 
         if (team) {
-            console.log("Received trySubMove event from team " + teamId);
-
             const result = team.tryMoveSub(gameState.grid, dir);
             if (result.success) {
                 io.emit(SocketEvents.updateGameState, gameState);
@@ -64,10 +63,10 @@ io.on("connection", (socket) => {
     });
 
     socket.on(SocketEvents.submerge, (teamId: number) => {
+        console.log("Received submerge event from team " + teamId);
         const team = gameState.teams[teamId];
 
         if (team) {
-            console.log("Received submerge event from team " + teamId);
             const result = team.submerge();
             if (result) {
                 io.emit(SocketEvents.updateGameState, gameState);
@@ -76,10 +75,10 @@ io.on("connection", (socket) => {
     });
 
     socket.on(SocketEvents.surface, (teamId: number) => {
+        console.log("Received surface event from team " + teamId);
         const team = gameState.teams[teamId];
 
         if (team) {
-            console.log("Received surface event from team " + teamId);
             const result = team.surface();
             if (result) {
                 io.emit(SocketEvents.updateGameState, gameState);
@@ -92,10 +91,10 @@ io.on("connection", (socket) => {
         dir: Direction,
         systemNodeId: number
     ) => {
+        console.log("Received break system node event from team " + teamId);
         const team = gameState.teams[teamId];
 
         if (team) {
-            console.log("Received break system node event from team " + teamId);
             const result = team.breakSystemNode(dir, systemNodeId);
             if (result.success) {
                 io.emit(SocketEvents.updateGameState, gameState);
@@ -112,6 +111,7 @@ io.on("connection", (socket) => {
             teamSizes[teamId]--;
         }
         delete players[socket.id];
+
         console.log("User disconnected: ", socket.id);
         console.log("Players:");
         console.log(players);
