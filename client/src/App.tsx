@@ -58,6 +58,7 @@ const App = () => {
   return (
     <div className="main-div">
       <div className="eng-board">
+      <div>{gameState.teams[teamId] && gameState.teams[teamId].pendingMove !== null ? "Active" : "Inactive"}</div>
         {
           gameState.teams[teamId] ?
             <EngineerBoard
@@ -72,6 +73,7 @@ const App = () => {
         }
       </div>
       <div className="move-grid">
+        <div>{gameState.teams[teamId] && gameState.teams[teamId].pendingMove === null ? "Active" : "Inactive"}</div>
         <div>You&apos;re on team {teamId + 1}</div>
         {
           gameState.teams[teamId] ?

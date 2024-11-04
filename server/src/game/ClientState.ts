@@ -13,6 +13,10 @@ class ClientState implements IClientState {
     systemBreakages: { [id: string]: number; };
     circuitBreakages: number[];
     subHealth: number;
+    pendingMove: {
+        coord: Point,
+        dir: Direction,
+    } | null;
 
     constructor(teamId: number, xPos: number, yPos: number) {
         this.teamId = teamId;
@@ -25,6 +29,7 @@ class ClientState implements IClientState {
         this.subRoute = [];
         this.subHealth = STARTING_SUB_HEALTH;
         this.systemBreakages = {};
+        this.pendingMove = null;
 
         this.initEngSystemNodeGroups();
         this.resetSystemBreakages();
@@ -91,7 +96,7 @@ class ClientState implements IClientState {
         const { isValid, message } = this.isValidMove(grid, newSubPos);
 
         if (isValid) {
-            this.moveSub(newSubPos);
+            this.queueMove(newSubPos, dir);
 
             response = {
                 success: true,
@@ -107,11 +112,21 @@ class ClientState implements IClientState {
         return response;
     };
 
+    queueMove(newSubPos: Point, dir: Direction): void {
+        this.pendingMove = {
+            coord: newSubPos,
+            dir: dir
+        };
+        console.log("New pending move: ", this.pendingMove);
+    }
+
     // Actually move the sub.
-    moveSub(newSubPos: Point): void {
-        this.subRoute.push(this.subPosition);
-        console.log(this.subRoute);
-        this.subPosition = newSubPos;
+    moveSub(): void {
+        if (this.pendingMove != null) {
+            this.subRoute.push(this.subPosition);
+            this.subPosition = this.pendingMove.coord;
+            this.pendingMove = null;
+        }
     };
 
     /**
@@ -182,6 +197,10 @@ class ClientState implements IClientState {
                 if (this.circuitBreakages[nodeToBreak.circuit] === CIRCUIT_SELF_HEAL_THRESHOLD) {
                     this.fixCircuit(nodeToBreak.circuit);
                 }
+            }
+
+            if (this.pendingMove != null) {
+                this.moveSub();
             }
 
             return {

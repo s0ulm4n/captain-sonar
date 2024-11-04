@@ -1,4 +1,4 @@
-import { GridCell, SubSystem } from "./enums.mjs";
+import { Direction, GridCell, SubSystem } from "./enums.mjs";
 import { Point } from "./types.js";
 
 export interface IGameState {
@@ -8,13 +8,17 @@ export interface IGameState {
 
 export interface IClientState {
     teamId: number;
-    isSurfaced: boolean,
-    subPosition: Point,
-    subRoute: Point[],
+    isSurfaced: boolean;
+    subPosition: Point;
+    subRoute: Point[];
     engSystemNodeGroups: { [id: string]: IEngSystemNode[]; };
     systemBreakages: { [id: string]: number; };
     circuitBreakages: number[];
     subHealth: number;
+    pendingMove: {
+        coord: Point;
+        dir: Direction;
+    } | null;
 }
 
 export interface IEngSystemNode {
