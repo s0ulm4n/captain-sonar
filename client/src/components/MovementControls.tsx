@@ -8,20 +8,32 @@ const MovementControls = ({ onClick }: Props) => {
     return (
         <>
             <div>
-                <button className="direction-button" onClick={() => onClick(Direction.North)}>
+                <button 
+                    className="animated-button direction-button" 
+                    onClick={() => onClick(Direction.North)}
+                >
                     N
                 </button>
             </div>
             <div>
-                <button className="direction-button" onClick={() => onClick(Direction.West)}>
+                <button 
+                    className="animated-button direction-button" 
+                    onClick={() => onClick(Direction.West)}
+                >
                     W
                 </button>
-                <button className="direction-button" onClick={() => onClick(Direction.East)}>
+                <button 
+                    className="animated-button direction-button" 
+                    onClick={() => onClick(Direction.East)}
+                >
                     E
                 </button>
             </div>
             <div>
-                <button className="direction-button" onClick={() => onClick(Direction.South)}>
+                <button 
+                    className="animated-button direction-button" 
+                    onClick={() => onClick(Direction.South)}
+                >
                     S
                 </button>
             </div>

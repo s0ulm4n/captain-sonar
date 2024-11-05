@@ -12,24 +12,24 @@ type Props = {
 const EngineerSystemNode = ({ id, group, system, isBroken, circuit = null, onClick }: Props) => {
     const text = !isBroken ? <>{system}</> : <s>{system}</s>;
 
-    let buttonClass = "";
+    let circuitClass = "";
     switch (circuit) {
         case 1:
-            buttonClass = "circuit-1";
+            circuitClass = "circuit-1";
             break;
         case 2:
-            buttonClass = "circuit-2";
+            circuitClass = "circuit-2";
             break;
         case 3:
-            buttonClass = "circuit-3";
+            circuitClass = "circuit-3";
             break;
         default:
-            buttonClass = "circuit-none";
+            circuitClass = "circuit-none";
     }
 
     return (
         <button
-            className={buttonClass}
+            className={"animated-button eng-board-button " + circuitClass}
             onClick={() => onClick(group, id)}
         >
             {text}
