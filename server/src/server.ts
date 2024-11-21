@@ -1,7 +1,7 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { Direction, SocketEvents } from "../../shared/enums.mjs";
+import { Ability, Direction, SocketEvents } from "../../shared/enums.mjs";
 import GameState from "./game/GameState.js";
 
 /* Setup the server and init socket.io */
@@ -97,10 +97,42 @@ io.on("connection", (socket) => {
         if (team) {
             const result = team.breakSystemNode(dir, systemNodeId);
             if (result.success) {
+                if (
+                    team.pendingMove &&
+                    team.pendingMove.engineerAck && team.pendingMove.firstMateAck
+                ) {
+                    team.moveSub();
+                }
                 io.emit(SocketEvents.updateGameState, gameState);
             } else {
                 console.log(result.message);
             }
+        }
+    });
+
+    socket.on(SocketEvents.chargeAbility, (teamId: number, ability: Ability) => {
+        console.log("Received charge ability (" + ability + ") event from team " + teamId);
+        const team = gameState.teams[teamId];
+
+        if (team) {
+            team.chargeAbility(ability);
+            if (
+                team.pendingMove &&
+                team.pendingMove.engineerAck && team.pendingMove.firstMateAck
+            ) {
+                team.moveSub();
+            }
+            io.emit(SocketEvents.updateGameState, gameState);
+        }
+    });
+
+    socket.on(SocketEvents.activateAbility, (teamId: number, ability: Ability) => {
+        console.log("Received activate ability (" + ability + ") event from team " + teamId);
+        const team = gameState.teams[teamId];
+
+        if (team) {
+            team.activateAbility(ability);
+            io.emit(SocketEvents.updateGameState, gameState);
         }
     });
 

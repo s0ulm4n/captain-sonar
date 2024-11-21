@@ -15,6 +15,8 @@ const EngineerSystemNodeGroup = ({ group, nodes, onClick }: Props) => {
         row1.push(
             <td>
                 <EngineerSystemNode
+                    // TODO: use guid?
+                    key={group + "_" + nodes[i].id}
                     id={nodes[i].id}
                     group={group}
                     system={nodes[i].system}
@@ -27,6 +29,8 @@ const EngineerSystemNodeGroup = ({ group, nodes, onClick }: Props) => {
         row2.push(
             <td>
                 <EngineerSystemNode
+                    // TODO: use guid?
+                    key={group + "_" + nodes[i + 3].id}
                     id={nodes[i + 3].id}
                     group={group}
                     system={nodes[i + 3].system}
@@ -42,15 +46,17 @@ const EngineerSystemNodeGroup = ({ group, nodes, onClick }: Props) => {
     // Expecting to have 6 nodes total
     return (
         <table>
-            <tr>
-                <th>{group}</th>
-            </tr>
-            <tr>
-                {row1}
-            </tr>
-            <tr>
-                {row2}
-            </tr>
+            <tbody>
+                <tr>
+                    <th>{group}</th>
+                </tr>
+                <tr>
+                    {row1}
+                </tr>
+                <tr>
+                    {row2}
+                </tr>
+            </tbody>
         </table>
     );
 };

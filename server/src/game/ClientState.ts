@@ -1,8 +1,9 @@
-import { CIRCUIT_SELF_HEAL_THRESHOLD, GRID_SIZE, STARTING_SUB_HEALTH } from "../../../shared/constants.mjs";
-import { Direction, GridCell, SubSystem } from "../../../shared/enums.mjs";
+import { CIRCUIT_SELF_HEAL_THRESHOLD, DRONES_READINESS_THRESHOLD, GRID_SIZE, MINES_READINESS_THRESHOLD, SILENCE_READINESS_THRESHOLD, SONAR_READINESS_THRESHOLD, STARTING_SUB_HEALTH, TORPEDO_READINESS_THRESHOLD } from "../../../shared/constants.mjs";
+import { Ability, Direction, GridCell, SubSystem } from "../../../shared/enums.mjs";
 import { Point } from "../../../shared/types.js";
 import EngSystemNode from "./EngSystemNode.js";
-import { IClientState } from "../../../shared/interfaces.mjs";
+import { IClientState, ISubAbility } from "../../../shared/interfaces.mjs";
+import SubAbility from "./SubAbility.js";
 
 class ClientState implements IClientState {
     teamId: number;
@@ -16,7 +17,10 @@ class ClientState implements IClientState {
     pendingMove: {
         coord: Point,
         dir: Direction,
+        engineerAck: boolean,
+        firstMateAck: boolean,
     } | null;
+    abilities: { [id: string]: ISubAbility; };
 
     constructor(teamId: number, xPos: number, yPos: number) {
         this.teamId = teamId;
@@ -32,13 +36,14 @@ class ClientState implements IClientState {
         this.pendingMove = null;
 
         this.initEngSystemNodeGroups();
+        this.initSubAbilities();
         this.resetSystemBreakages();
     }
 
     /** Game actions **/
 
     /**
-     * Attemt to move the submarine
+     * Validate a move order and record it as pending if it's valid.
      */
     tryMoveSub(grid: GridCell[][], dir: Direction): {
         success: boolean,
@@ -112,17 +117,27 @@ class ClientState implements IClientState {
         return response;
     };
 
+    /**
+     * Record a move as pending.
+     */
     queueMove(newSubPos: Point, dir: Direction): void {
         this.pendingMove = {
             coord: newSubPos,
-            dir: dir
+            dir: dir,
+            engineerAck: false,
+            firstMateAck: false,
         };
         console.log("New pending move: ", this.pendingMove);
     }
 
-    // Actually move the sub.
+    /**
+     * Resolve a pending sub move order.
+     */
     moveSub(): void {
-        if (this.pendingMove != null) {
+        if (
+            this.pendingMove != null && this.pendingMove.engineerAck &&
+            this.pendingMove.firstMateAck
+        ) {
             this.subRoute.push(this.subPosition);
             this.subPosition = this.pendingMove.coord;
             this.pendingMove = null;
@@ -170,7 +185,10 @@ class ClientState implements IClientState {
     /**
      * Break a single engineering system node
      */
-    breakSystemNode(dir: Direction, systemNodeId: number) {
+    breakSystemNode(dir: Direction, systemNodeId: number): {
+        success: boolean,
+        message: string,
+    } {
         // Movement direction tells us which node group to look at
         const systemNodeGroup = this.engSystemNodeGroups[dir];
 
@@ -200,7 +218,7 @@ class ClientState implements IClientState {
             }
 
             if (this.pendingMove != null) {
-                this.moveSub();
+                this.pendingMove.engineerAck = true;
             }
 
             return {
@@ -214,6 +232,28 @@ class ClientState implements IClientState {
             };
         }
     };
+
+    /**
+     * Add 1 charge to a submarine ability unless it's fully charged.
+     */
+    chargeAbility(ability: Ability): void {
+        this.abilities[ability].readiness = Math.min(
+            this.abilities[ability].readiness + 1,
+            this.abilities[ability].readinessThreshold
+        );
+
+        if (this.pendingMove != null) {
+            this.pendingMove.firstMateAck = true;
+        }
+
+        console.log("New ability readiness: ", this.abilities[ability].readiness);
+    }
+
+    // TODO: this is a placeholder!
+    activateAbility(ability: Ability): void {
+        this.abilities[ability].readiness = 0;
+        console.log("Ability reset: ", ability);
+    }
 
     /** Private helpers **/
 
@@ -251,6 +291,20 @@ class ClientState implements IClientState {
             new EngSystemNode(34, SubSystem.Sonar),
             new EngSystemNode(35, SubSystem.Reactor),
         ];
+    }
+
+    private initSubAbilities(): void {
+        this.abilities = {};
+        this.abilities[Ability.Mines] =
+            new SubAbility(Ability.Mines, SubSystem.Weapons, MINES_READINESS_THRESHOLD);
+        this.abilities[Ability.Torpedo] =
+            new SubAbility(Ability.Torpedo, SubSystem.Weapons, TORPEDO_READINESS_THRESHOLD);
+        this.abilities[Ability.Drones] =
+            new SubAbility(Ability.Drones, SubSystem.Sonar, DRONES_READINESS_THRESHOLD);
+        this.abilities[Ability.Sonar] =
+            new SubAbility(Ability.Sonar, SubSystem.Sonar, SONAR_READINESS_THRESHOLD);
+        this.abilities[Ability.Silence] =
+            new SubAbility(Ability.Silence, SubSystem.Silence, SILENCE_READINESS_THRESHOLD);
     }
 
     private resetSystemBreakages(): void {

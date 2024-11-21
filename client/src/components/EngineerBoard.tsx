@@ -15,6 +15,8 @@ const EngineerBoard = ({ nodeGroups, onClick }: Props) => {
     for (const dir in Direction) {
         components.push(
             <EngineerSystemNodeGroup
+                // TODO: use guid?
+                key={dir}
                 group={dir as Direction}
                 nodes={nodeGroups[dir]}
                 onClick={onClick}

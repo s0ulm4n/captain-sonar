@@ -3,10 +3,11 @@ import './App.css';
 import { IGameState } from "../../shared/interfaces.mts";
 import Grid from "./components/Grid";
 import MovementControls from "./components/MovementControls";
-import { Direction, SocketEvents } from "../../shared/enums.mts";
+import { Ability, Direction, SocketEvents } from "../../shared/enums.mts";
 import SurfacingControls from "./components/SurfacingControls";
 import { socket } from "./main";
 import EngineerBoard from "./components/EngineerBoard";
+import SubAbilitiesBoard from "./components/SubAbilitiesBoard";
 
 const App = () => {
   const [gameState, setGameState] = useState<IGameState>({
@@ -57,21 +58,39 @@ const App = () => {
 
   return (
     <div className="main-div">
-      <div className="eng-board">
-      <div>{gameState.teams[teamId] && gameState.teams[teamId].pendingMove !== null ? "Active" : "Inactive"}</div>
+      <div className="ability-board">
+        <div>{gameState.teams[teamId] && gameState.teams[teamId].pendingMove !== null ? "Active" : "Inactive"}</div>
         {
           gameState.teams[teamId] ?
-            <EngineerBoard
-              nodeGroups={gameState.teams[teamId].engSystemNodeGroups}
-              onClick={
-                (dir: Direction, id: number) =>
-                  socket.emit(SocketEvents.breakSystemNode, teamId, dir, id)
+            <SubAbilitiesBoard 
+              abilities={gameState.teams[teamId].abilities}
+              systemBreakages={gameState.teams[teamId].systemBreakages}
+              onChargeClick={
+                (ability: Ability) => socket.emit(SocketEvents.chargeAbility, teamId, ability)
+              }
+              onActivateClick={
+                (ability: Ability) => socket.emit(SocketEvents.activateAbility, teamId, ability)
               }
             />
             :
             null
         }
       </div>
+      <div className="eng-board">
+        <div>{gameState.teams[teamId] && gameState.teams[teamId].pendingMove !== null ? "Active" : "Inactive"}</div>
+          {
+            gameState.teams[teamId] ?
+              <EngineerBoard
+                nodeGroups={gameState.teams[teamId].engSystemNodeGroups}
+                onClick={
+                  (dir: Direction, id: number) =>
+                    socket.emit(SocketEvents.breakSystemNode, teamId, dir, id)
+                }
+              />
+              :
+              null
+          }
+        </div>
       <div className="move-grid">
         <div>{gameState.teams[teamId] && gameState.teams[teamId].pendingMove === null ? "Active" : "Inactive"}</div>
         <div>You&apos;re on team {teamId + 1}</div>

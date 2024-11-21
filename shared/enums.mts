@@ -21,6 +21,15 @@ export const enum SubSystem {
     Reactor = "Reactor",
 }
 
+// Note: this is a "computed" enum, see above for the reason.
+export enum Ability {
+    Mines = "Mines",
+    Torpedo = "Torpedo",
+    Drones = "Drones",
+    Sonar = "Sonar",
+    Silence = "Silence",
+}
+
 // List of socket communication events
 export const enum SocketEvents {
     updateTeamId = "updateTeamId",
@@ -29,4 +38,6 @@ export const enum SocketEvents {
     surface = "surface",
     submerge = "submerge",
     breakSystemNode = "breakSystemNode",
+    chargeAbility = "chargeAbility",
+    activateAbility = "activateAbility",
 };
