@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import './App.css';
-import { IGameState } from "../../shared/interfaces.mts";
+import { IGameState, IPlayerState } from "../../shared/interfaces.mts";
 import Grid from "./components/Grid";
 import MovementControls from "./components/MovementControls";
-import { Ability, Direction, SocketEvents } from "../../shared/enums.mts";
+import { Ability, Direction, PlayerRole, SocketEvents } from "../../shared/enums.mts";
 import SurfacingControls from "./components/SurfacingControls";
 import { socket } from "./main";
 import EngineerBoard from "./components/EngineerBoard";
@@ -14,7 +14,12 @@ const App = () => {
     grid: [],
     teams: [],
   });
-  const [teamId, setTeamId] = useState<number>(-1);
+  const [playerState, setPlayerState] = useState<IPlayerState>({
+    id: "",
+    teamId: -1,
+    role: PlayerRole.NONE,
+  })
+  // const [teamId, setTeamId] = useState<number>(-1);
 
   // This will run once after the main component mounts.
   // In dev mode, the main component is mounted, unmounted, then mounted again.
@@ -36,21 +41,22 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const onUpdateTeamId = (teamId: 0 | 1) => {
-      console.log("Client received teamId: " + teamId);
-      setTeamId(teamId);
-    };
+    const onUpdatePlayerState = (playerState: IPlayerState) => {
+      console.log("Client received player state:");
+      console.log(playerState);
+      setPlayerState(playerState);
+    }
     const onUpdateGameState = (gameState: IGameState) => {
       console.log("Client received game state:");
       console.log(gameState);
       setGameState(gameState);
     };
 
-    socket.on(SocketEvents.updateTeamId, onUpdateTeamId);
+    socket.on(SocketEvents.updatePlayerState, onUpdatePlayerState);
     socket.on(SocketEvents.updateGameState, onUpdateGameState);
 
     return () => {
-      socket.off(SocketEvents.updateTeamId, onUpdateTeamId);
+      socket.off(SocketEvents.updatePlayerState, onUpdatePlayerState);
       socket.off(SocketEvents.updateGameState, onUpdateGameState);
     };
     // }, [teamId, gameState]);
@@ -58,59 +64,92 @@ const App = () => {
 
   return (
     <div className="main-div">
-      <div className="ability-board">
-        <div>{gameState.teams[teamId] && gameState.teams[teamId].pendingMove !== null ? "Active" : "Inactive"}</div>
+      <div 
+        className="ability-board" 
+        hidden={playerState.role !== PlayerRole.FirstMate && playerState.role !== PlayerRole.DEV_MODE}
+      >
+        <div>
+          {
+            gameState.teams[playerState.teamId] && 
+            gameState.teams[playerState.teamId].pendingMove !== null 
+            ? "Active" : "Inactive"
+          }
+        </div>
         {
-          gameState.teams[teamId] ?
+          gameState.teams[playerState.teamId] ?
             <SubAbilitiesBoard 
-              abilities={gameState.teams[teamId].abilities}
-              systemBreakages={gameState.teams[teamId].systemBreakages}
+              abilities={gameState.teams[playerState.teamId].abilities}
+              systemBreakages={gameState.teams[playerState.teamId].systemBreakages}
               onChargeClick={
-                (ability: Ability) => socket.emit(SocketEvents.chargeAbility, teamId, ability)
+                (ability: Ability) => 
+                  socket.emit(SocketEvents.chargeAbility, playerState.teamId, ability)
               }
               onActivateClick={
-                (ability: Ability) => socket.emit(SocketEvents.activateAbility, teamId, ability)
+                (ability: Ability) => 
+                  socket.emit(SocketEvents.activateAbility, playerState.teamId, ability)
               }
             />
             :
             null
         }
       </div>
-      <div className="eng-board">
-        <div>{gameState.teams[teamId] && gameState.teams[teamId].pendingMove !== null ? "Active" : "Inactive"}</div>
+      <div 
+        className="eng-board"
+        hidden={playerState.role !== PlayerRole.Engineer && playerState.role !== PlayerRole.DEV_MODE}
+      >
+        <div>
           {
-            gameState.teams[teamId] ?
-              <EngineerBoard
-                nodeGroups={gameState.teams[teamId].engSystemNodeGroups}
-                onClick={
-                  (dir: Direction, id: number) =>
-                    socket.emit(SocketEvents.breakSystemNode, teamId, dir, id)
-                }
-              />
-              :
-              null
+            gameState.teams[playerState.teamId] && 
+            gameState.teams[playerState.teamId].pendingMove !== null 
+            ? "Active" : "Inactive"
           }
         </div>
-      <div className="move-grid">
-        <div>{gameState.teams[teamId] && gameState.teams[teamId].pendingMove === null ? "Active" : "Inactive"}</div>
-        <div>You&apos;re on team {teamId + 1}</div>
         {
-          gameState.teams[teamId] ?
+          gameState.teams[playerState.teamId] ?
+            <EngineerBoard
+              nodeGroups={gameState.teams[playerState.teamId].engSystemNodeGroups}
+              onClick={
+                (dir: Direction, id: number) =>
+                  socket.emit(SocketEvents.breakSystemNode, playerState.teamId, dir, id)
+              }
+            />
+            :
+            null
+        }
+      </div>
+      <div 
+        className="move-grid"
+        hidden={playerState.role !== PlayerRole.Captain && playerState.role !== PlayerRole.DEV_MODE}
+      >
+        <div>
+          {
+            gameState.teams[playerState.teamId] && 
+            gameState.teams[playerState.teamId].pendingMove === null 
+            ? "Active" : "Inactive"
+          }
+        </div>
+        <div>You&apos;re on team {playerState.teamId + 1}</div>
+        {
+          gameState.teams[playerState.teamId] ?
             <Grid
               grid={gameState.grid}
-              subPosition={gameState.teams[teamId].subPosition}
-              subRoute={gameState.teams[teamId].subRoute}
+              subPosition={gameState.teams[playerState.teamId].subPosition}
+              subRoute={gameState.teams[playerState.teamId].subRoute}
             />
             :
             null
         }
         <MovementControls onClick={(dir: Direction) => {
-          socket.emit(SocketEvents.tryMoveSub, teamId, dir);
+          socket.emit(SocketEvents.tryMoveSub, playerState.teamId, dir);
         }} />
         <SurfacingControls
-          isSurfaced={gameState.teams[teamId] ? gameState.teams[teamId].isSurfaced : false}
-          onSurfaceClick={() => socket.emit(SocketEvents.surface, teamId)}
-          onSubmergeClick={() => socket.emit(SocketEvents.submerge, teamId)}
+          isSurfaced={
+            gameState.teams[playerState.teamId] 
+            ? gameState.teams[playerState.teamId].isSurfaced 
+            : false
+          }
+          onSurfaceClick={() => socket.emit(SocketEvents.surface, playerState.teamId)}
+          onSubmergeClick={() => socket.emit(SocketEvents.submerge, playerState.teamId)}
         />
       </div>
     </div>

@@ -1,8 +1,9 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { Ability, Direction, SocketEvents } from "../../shared/enums.mjs";
+import { Ability, Direction, PlayerRole, SocketEvents } from "../../shared/enums.mjs";
 import GameState from "./game/GameState.js";
+import { IPlayerState } from "../../shared/interfaces.mjs";
 
 /* Setup the server and init socket.io */
 const port = process.env.APP_PORT || 4000;
@@ -16,12 +17,7 @@ const io = new Server(server, {
     }
 });
 
-const players: {
-    [id: string]: {
-        id: string,
-        teamId: number,
-    };
-} = {};
+const players: { [id: string]: IPlayerState; } = {};
 const teamSizes = [0, 0];
 
 /* Initialize game state */
@@ -38,14 +34,16 @@ io.on("connection", (socket) => {
     const newPlayer = {
         id: socket.id,
         teamId: team,
+        // For now just assign the DEV_MODE role to everyone!
+        role: PlayerRole.DEV_MODE,
     };
     players[socket.id] = newPlayer;
     console.log("Players:");
     console.log(players);
 
-    // Emit the "updateTeamId" and "updateGameState" events 
+    // Emit the "updatePlayerState" and "updateGameState" events 
     // only to the player who just joined
-    io.to(socket.id).emit(SocketEvents.updateTeamId, newPlayer.teamId);
+    io.to(socket.id).emit(SocketEvents.updatePlayerState, newPlayer);
     io.to(socket.id).emit(SocketEvents.updateGameState, gameState);
 
     socket.on(SocketEvents.tryMoveSub, (teamId: number, dir: Direction) => {
@@ -139,8 +137,7 @@ io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         const player = players[socket.id];
         if (player) {
-            const teamId = player.teamId;
-            teamSizes[teamId]--;
+            teamSizes[player.teamId]--;
         }
         delete players[socket.id];
 

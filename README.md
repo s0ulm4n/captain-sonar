@@ -20,7 +20,9 @@ Milestones:
 
 ~~8) Add partial implementation of the Weapons/Powers systems and UI. No separate player roles still.~~
 
-9) Add player roles + a DEV MODE role that acts as every role at once.
+~~9) Add player roles + a DEV MODE role that acts as every role at once.~~
+
+10) Add radio operator UI and mechanics
 
 Tech debt:
 

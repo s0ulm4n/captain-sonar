@@ -30,9 +30,22 @@ export enum Ability {
     Silence = "Silence",
 }
 
+export const enum PlayerRole {
+    // This role mostly exists for initialization purposes
+    NONE = "NONE",
+    Captain = "Captain",
+    Engineer = "Engineer",
+    // I kinda hate the name, should change!
+    FirstMate = "FirstMate",
+    RadioOperator = "RadioOperator",
+    // Special role for debug purposes only!
+    DEV_MODE = "DEV_MODE",
+}
+
 // List of socket communication events
 export const enum SocketEvents {
     updateTeamId = "updateTeamId",
+    updatePlayerState = "updatePlayerState",
     updateGameState = "updateGameState",
     tryMoveSub = "tryMoveSub",
     surface = "surface",
