@@ -22,10 +22,14 @@ Milestones:
 
 ~~9) Add player roles + a DEV MODE role that acts as every role at once.~~
 
-10) Add radio operator UI and mechanics
+~~10) Add radio operator UI and mechanics.~~
+
+11) Add global chat.
 
 Tech debt:
 
 1) There are definitely possible race conditions, at least when receiving acks from engineer and first mate. Need to add mutex to deal with them. See https://www.nodejsdesignpatterns.com/blog/node-js-race-conditions/
 
 2) How to handle a situation when the captain orders a move, but the first mate can't charge any systems because they are all already fully charged.
+
+3) The "team" should definitely be its own object capable of handling adding and removing players.

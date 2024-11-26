@@ -19,6 +19,7 @@ class ClientState implements IClientState {
         dir: Direction,
         engineerAck: boolean,
         firstMateAck: boolean,
+        radioCallback: () => void,
     } | null;
     abilities: { [id: string]: ISubAbility; };
 
@@ -45,7 +46,11 @@ class ClientState implements IClientState {
     /**
      * Validate a move order and record it as pending if it's valid.
      */
-    tryMoveSub(grid: GridCell[][], dir: Direction): {
+    tryMoveSub(
+        grid: GridCell[][],
+        dir: Direction,
+        radioCallback: () => void,
+    ): {
         success: boolean,
         message: string,
     } {
@@ -101,7 +106,7 @@ class ClientState implements IClientState {
         const { isValid, message } = this.isValidMove(grid, newSubPos);
 
         if (isValid) {
-            this.queueMove(newSubPos, dir);
+            this.queueMove(newSubPos, dir, radioCallback);
 
             response = {
                 success: true,
@@ -120,12 +125,17 @@ class ClientState implements IClientState {
     /**
      * Record a move as pending.
      */
-    queueMove(newSubPos: Point, dir: Direction): void {
+    queueMove(
+        newSubPos: Point,
+        dir: Direction,
+        radioCallback: () => void
+    ): void {
         this.pendingMove = {
             coord: newSubPos,
             dir: dir,
             engineerAck: false,
             firstMateAck: false,
+            radioCallback: radioCallback,
         };
         console.log("New pending move: ", this.pendingMove);
     }
@@ -140,6 +150,8 @@ class ClientState implements IClientState {
         ) {
             this.subRoute.push(this.subPosition);
             this.subPosition = this.pendingMove.coord;
+            this.pendingMove.radioCallback();
+
             this.pendingMove = null;
         }
     };

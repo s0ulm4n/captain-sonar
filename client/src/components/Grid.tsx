@@ -9,7 +9,7 @@ type Props = {
 };
 
 const Grid = ({ grid, subPosition, subRoute }: Props) => {
-    let output = [];
+    const output: string[][] = [];
 
     // console.log("Rendering grid");
     // console.log(grid);
@@ -17,7 +17,7 @@ const Grid = ({ grid, subPosition, subRoute }: Props) => {
 
     if (grid && subPosition) {
         for (let y = 0; y < GRID_SIZE; y++) {
-            let line = [];
+            const line: string[] = [];
 
             for (let x = 0; x < GRID_SIZE; x++) {
                 {

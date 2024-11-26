@@ -8,6 +8,7 @@ import SurfacingControls from "./components/SurfacingControls";
 import { socket } from "./main";
 import EngineerBoard from "./components/EngineerBoard";
 import SubAbilitiesBoard from "./components/SubAbilitiesBoard";
+import RadioMessages from "./components/RadioMessages";
 
 const App = () => {
   const [gameState, setGameState] = useState<IGameState>({
@@ -19,7 +20,7 @@ const App = () => {
     teamId: -1,
     role: PlayerRole.NONE,
   })
-  // const [teamId, setTeamId] = useState<number>(-1);
+  const [radioMessages, setRadioMessages] = useState<string[]>([]);
 
   // This will run once after the main component mounts.
   // In dev mode, the main component is mounted, unmounted, then mounted again.
@@ -41,23 +42,30 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const onUpdatePlayerState = (playerState: IPlayerState) => {
+    const onUpdatePlayerState = (newPlayerState: IPlayerState) => {
       console.log("Client received player state:");
-      console.log(playerState);
-      setPlayerState(playerState);
+      console.log(newPlayerState);
+      setPlayerState(newPlayerState);
     }
-    const onUpdateGameState = (gameState: IGameState) => {
+    const onUpdateGameState = (newGameState: IGameState) => {
       console.log("Client received game state:");
-      console.log(gameState);
-      setGameState(gameState);
+      console.log(newGameState);
+      setGameState(newGameState);
     };
+    const onUpdateRadioMessages = (messages: string[]) => {
+      console.log("Client received updated radio messages");
+      console.log(messages);
+      setRadioMessages(messages);
+    }
 
     socket.on(SocketEvents.updatePlayerState, onUpdatePlayerState);
     socket.on(SocketEvents.updateGameState, onUpdateGameState);
+    socket.on(SocketEvents.updateRadioMessages, onUpdateRadioMessages);
 
     return () => {
       socket.off(SocketEvents.updatePlayerState, onUpdatePlayerState);
       socket.off(SocketEvents.updateGameState, onUpdateGameState);
+      socket.off(SocketEvents.updateRadioMessages, onUpdateRadioMessages);
     };
     // }, [teamId, gameState]);
   }, []);
@@ -151,6 +159,9 @@ const App = () => {
           onSurfaceClick={() => socket.emit(SocketEvents.surface, playerState.teamId)}
           onSubmergeClick={() => socket.emit(SocketEvents.submerge, playerState.teamId)}
         />
+      </div>
+      <div className="radio">
+        <RadioMessages messages={radioMessages} />
       </div>
     </div>
   );

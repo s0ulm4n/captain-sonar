@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import { Ability, Direction, PlayerRole, SocketEvents } from "../../shared/enums.mjs";
 import GameState from "./game/GameState.js";
 import { IPlayerState } from "../../shared/interfaces.mjs";
+import RadioMessages from "./game/RadioMessages.js";
 
 /* Setup the server and init socket.io */
 const port = process.env.APP_PORT || 4000;
@@ -18,28 +19,46 @@ const io = new Server(server, {
 });
 
 const players: { [id: string]: IPlayerState; } = {};
+const teamCompositions: {
+    [teamId: number]: {
+        [role: string]: {
+            socketId: string,
+        };
+    };
+} = {
+    0: {},
+    1: {},
+};
 const teamSizes = [0, 0];
 
 /* Initialize game state */
 const gameState = new GameState();
+const radioMessages: { [teamId: number]: RadioMessages; } = {
+    0: new RadioMessages(),
+    1: new RadioMessages(),
+};
 
 io.on("connection", (socket) => {
     console.log("User connected: ", socket.id);
 
     // Put the player into one of the teams 
     // based on which one has more active players
-    const team = teamSizes[0] > teamSizes[1] ? 1 : 0;
-    teamSizes[team]++;
+    const teamId = teamSizes[0] > teamSizes[1] ? 1 : 0;
+    teamSizes[teamId]++;
 
     const newPlayer = {
         id: socket.id,
-        teamId: team,
+        teamId: teamId,
         // For now just assign the DEV_MODE role to everyone!
         role: PlayerRole.DEV_MODE,
     };
+    // Add the player's socket ID to the list of currently connected players.
     players[socket.id] = newPlayer;
     console.log("Players:");
     console.log(players);
+
+    // Map the player's socket ID to the role he has on the team.
+    teamCompositions[teamId][newPlayer.role] = { socketId: socket.id };
 
     // Emit the "updatePlayerState" and "updateGameState" events 
     // only to the player who just joined
@@ -51,7 +70,16 @@ io.on("connection", (socket) => {
         const team = gameState.teams[teamId];
 
         if (team) {
-            const result = team.tryMoveSub(gameState.grid, dir);
+            const result = team.tryMoveSub(
+                gameState.grid,
+                dir,
+                () => {
+                    console.log("Radio callback executed");
+                    radioMessages[1 - teamId].addMovementMessage(dir);
+                    // Send the radio message to the OPPOSITE team
+                    _sendUpdatedRadioMessagesToEnemyTeam(teamId);
+                }
+            );
             if (result.success) {
                 io.emit(SocketEvents.updateGameState, gameState);
             } else {
@@ -67,7 +95,10 @@ io.on("connection", (socket) => {
         if (team) {
             const result = team.submerge();
             if (result) {
+                radioMessages[1 - teamId].addSubmergedMessage();
                 io.emit(SocketEvents.updateGameState, gameState);
+                // Send the radio message to the OPPOSITE team
+                _sendUpdatedRadioMessagesToEnemyTeam(teamId);
             }
         }
     });
@@ -79,7 +110,10 @@ io.on("connection", (socket) => {
         if (team) {
             const result = team.surface();
             if (result) {
+                radioMessages[1 - teamId].addSurfacedMessage();
                 io.emit(SocketEvents.updateGameState, gameState);
+                // Send the radio message to the OPPOSITE team
+                _sendUpdatedRadioMessagesToEnemyTeam(teamId);
             }
         }
     });
@@ -140,6 +174,7 @@ io.on("connection", (socket) => {
             teamSizes[player.teamId]--;
         }
         delete players[socket.id];
+        delete teamCompositions[player.teamId][player.role];
 
         console.log("User disconnected: ", socket.id);
         console.log("Players:");
@@ -150,3 +185,28 @@ io.on("connection", (socket) => {
 server.listen(port, () => {
     console.log("Server listening on port", port);
 });
+
+// TODO: "backup role" logic for radio operator.
+function _sendUpdatedRadioMessagesToEnemyTeam(currentTeamId: number) {
+    console.log("_sendUpdatedRadioMessagesToEnemyTeam");
+    const enemyTeamId = 1 - currentTeamId;
+
+    const enemyTeamRoles = Object.keys(teamCompositions[enemyTeamId]);
+    console.log("enemyTeamRoles: ", enemyTeamRoles);
+
+    let receivingPlayer: { socketId: string; } | null = null;
+    if (enemyTeamRoles.includes(PlayerRole.RadioOperator)) {
+        // If the team has a radio operator, send the messages to them.
+        receivingPlayer = teamCompositions[enemyTeamId][PlayerRole.RadioOperator];
+    } else if (enemyTeamRoles.includes(PlayerRole.DEV_MODE)) {
+        // If not, check for the DEV_MODE role
+        receivingPlayer = teamCompositions[enemyTeamId][PlayerRole.DEV_MODE];
+    }
+
+    if (receivingPlayer) {
+        io.to(receivingPlayer.socketId).emit(
+            SocketEvents.updateRadioMessages,
+            radioMessages[enemyTeamId].messages
+        );
+    }
+}

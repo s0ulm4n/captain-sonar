@@ -44,9 +44,9 @@ export const enum PlayerRole {
 
 // List of socket communication events
 export const enum SocketEvents {
-    updateTeamId = "updateTeamId",
     updatePlayerState = "updatePlayerState",
     updateGameState = "updateGameState",
+    updateRadioMessages = "updateRadioMessages",
     tryMoveSub = "tryMoveSub",
     surface = "surface",
     submerge = "submerge",
