@@ -5,6 +5,8 @@ import { Ability, Direction, PlayerRole, SocketEvents } from "../../shared/enums
 import GameState from "./game/GameState.js";
 import { IPlayerState } from "../../shared/interfaces.mjs";
 import RadioMessages from "./game/RadioMessages.js";
+import { ChatMessage } from "../../shared/types.js";
+import { GLOBAL_CHAT_MESSAGES_LIMIT } from "../../shared/constants.mjs";
 
 /* Setup the server and init socket.io */
 const port = process.env.APP_PORT || 4000;
@@ -37,6 +39,7 @@ const radioMessages: { [teamId: number]: RadioMessages; } = {
     0: new RadioMessages(),
     1: new RadioMessages(),
 };
+const globalChat: ChatMessage[] = [];
 
 io.on("connection", (socket) => {
     console.log("User connected: ", socket.id);
@@ -60,10 +63,10 @@ io.on("connection", (socket) => {
     // Map the player's socket ID to the role he has on the team.
     teamCompositions[teamId][newPlayer.role] = { socketId: socket.id };
 
-    // Emit the "updatePlayerState" and "updateGameState" events 
-    // only to the player who just joined
+    // Emit some update events only to the player who just joined
     io.to(socket.id).emit(SocketEvents.updatePlayerState, newPlayer);
     io.to(socket.id).emit(SocketEvents.updateGameState, gameState);
+    io.to(socket.id).emit(SocketEvents.updateGlobalChat, globalChat);
 
     socket.on(SocketEvents.tryMoveSub, (teamId: number, dir: Direction) => {
         console.log("Received trySubMove event from team " + teamId);
@@ -166,6 +169,22 @@ io.on("connection", (socket) => {
             team.activateAbility(ability);
             io.emit(SocketEvents.updateGameState, gameState);
         }
+    });
+
+    socket.on(SocketEvents.sendMessageToChat, (from: string, message: string) => {
+        console.log("New chat message");
+        console.log("From: ", from, "; Message: ", message);
+
+        globalChat.push({
+            from: from,
+            message: message,
+        });
+
+        if (globalChat.length > GLOBAL_CHAT_MESSAGES_LIMIT) {
+            globalChat.shift();
+        }
+
+        io.emit(SocketEvents.updateGlobalChat, globalChat);
     });
 
     socket.on("disconnect", () => {

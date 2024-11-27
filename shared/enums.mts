@@ -47,10 +47,12 @@ export const enum SocketEvents {
     updatePlayerState = "updatePlayerState",
     updateGameState = "updateGameState",
     updateRadioMessages = "updateRadioMessages",
+    updateGlobalChat = "updateGlobalChat",
     tryMoveSub = "tryMoveSub",
     surface = "surface",
     submerge = "submerge",
     breakSystemNode = "breakSystemNode",
     chargeAbility = "chargeAbility",
     activateAbility = "activateAbility",
+    sendMessageToChat = "sendMessageToChat",
 };

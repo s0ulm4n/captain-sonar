@@ -189,3 +189,14 @@
   border: 1px solid #00ff00;
   border-radius: 5px;
 }
+
+/** Global chat panel **/
+.global-chat {
+  text-align: left;
+}
+
+.global-chat-messages {
+  height: 200px;
+  overflow-y: scroll;
+  scrollbar-color: #00ff00 black;
+}
