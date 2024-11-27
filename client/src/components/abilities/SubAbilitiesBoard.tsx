@@ -1,5 +1,5 @@
-import { Ability } from "../../../shared/enums.mts";
-import { ISubAbility } from "../../../shared/interfaces.mts";
+import { Ability } from "../../../../shared/enums.mts";
+import { ISubAbility } from "../../../../shared/interfaces.mts";
 import SubAbilityControls from "./SubAbilityControls";
 
 type Props = {

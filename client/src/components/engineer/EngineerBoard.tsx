@@ -1,6 +1,6 @@
-import EngineerSystemNodeGroup from "./EngineerSystemNodesGroup.jsx";
-import { Direction } from "../../../shared/enums.mjs";
-import { IEngSystemNode } from "../../../shared/interfaces.mjs";
+import EngineerSystemNodeGroup from "./EngineerSystemNodesGroup.js";
+import { Direction } from "../../../../shared/enums.mjs";
+import { IEngSystemNode } from "../../../../shared/interfaces.mjs";
 
 type Props = {
     nodeGroups: {

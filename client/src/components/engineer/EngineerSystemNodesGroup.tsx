@@ -1,5 +1,5 @@
-import { Direction } from "../../../shared/enums.mts";
-import { IEngSystemNode } from "../../../shared/interfaces.mts";
+import { Direction } from "../../../../shared/enums.mts";
+import { IEngSystemNode } from "../../../../shared/interfaces.mts";
 import EngineerSystemNode from "./EngineerSystemNode";
 
 type Props = {

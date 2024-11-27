@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import './App.css';
 import { IGameState, IPlayerState } from "../../shared/interfaces.mts";
-import Grid from "./components/Grid";
-import MovementControls from "./components/MovementControls";
+import Grid from "./components/movement/Grid";
+import MovementControls from "./components/movement/MovementControls";
 import { Ability, Direction, PlayerRole, SocketEvents } from "../../shared/enums.mts";
-import SurfacingControls from "./components/SurfacingControls";
+import SurfacingControls from "./components/movement/SurfacingControls";
 import { socket } from "./main";
-import EngineerBoard from "./components/EngineerBoard";
-import SubAbilitiesBoard from "./components/SubAbilitiesBoard";
+import EngineerBoard from "./components/engineer/EngineerBoard";
+import SubAbilitiesBoard from "./components/abilities/SubAbilitiesBoard";
 import RadioMessages from "./components/RadioMessages";
 import { ChatMessage } from "../../shared/types";
 import GlobalChat from "./components/GlobalChat";

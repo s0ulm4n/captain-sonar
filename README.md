@@ -24,7 +24,9 @@ Milestones:
 
 ~~10) Add radio operator UI and mechanics.~~
 
-11) Add global chat.
+~~11) Add global chat.~~
+
+12) Add a modal dialog component to handle abilities activation.
 
 Tech debt:
 

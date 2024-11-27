@@ -1,4 +1,4 @@
-import { Direction } from "../../../shared/enums.mts";
+import { Direction } from "../../../../shared/enums.mts";
 
 type Props = {
     onClick: (dir: Direction) => void,

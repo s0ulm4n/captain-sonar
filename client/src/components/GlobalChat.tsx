@@ -1,4 +1,4 @@
-import { FormEvent, useRef } from "react";
+import { useRef } from "react";
 import { ChatMessage } from "../../../shared/types";
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
 const GlobalChat = ({ messages, sendMessageHandler }: Props) => {
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const handleSubmit = (event: FormEvent) => {
+    const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         if (inputRef && inputRef.current && inputRef.current.value.trim().length > 0) {
             sendMessageHandler(inputRef.current.value);

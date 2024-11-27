@@ -1,6 +1,6 @@
-import { GRID_SIZE } from "../../../shared/constants.mts";
-import type { Point } from "../../../shared/types";
-import { GridCell } from "../../../shared/enums.mts";
+import { GRID_SIZE } from "../../../../shared/constants.mts";
+import type { Point } from "../../../../shared/types";
+import { GridCell } from "../../../../shared/enums.mts";
 
 type Props = {
     grid: GridCell[][],

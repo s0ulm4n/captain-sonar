@@ -1,4 +1,4 @@
-import { Direction, SubSystem } from "../../../shared/enums.mts";
+import { Direction, SubSystem } from "../../../../shared/enums.mts";
 
 type Props = {
     id: number,
