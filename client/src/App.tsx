@@ -9,8 +9,9 @@ import { socket } from "./main";
 import EngineerBoard from "./components/engineer/EngineerBoard";
 import SubAbilitiesBoard from "./components/abilities/SubAbilitiesBoard";
 import RadioMessages from "./components/RadioMessages";
-import { ChatMessage } from "../../shared/types";
+import { ChatMessage, Point } from "../../shared/types";
 import GlobalChat from "./components/GlobalChat";
+import TorpedoLaunchDialog from "./components/modals/TorpedoLaunchDialog";
 
 const App = () => {
   const [gameState, setGameState] = useState<IGameState>({
@@ -23,16 +24,10 @@ const App = () => {
     role: PlayerRole.NONE,
   })
   const [radioMessages, setRadioMessages] = useState<string[]>([]);
-  const [globalChatMessages, setGlobalChatMessages] = useState<ChatMessage[]>([
-    {
-      from: "test",
-      message: "test message",
-    },
-    {
-      from: "test 2",
-      message: "la la la la la",
-    }
-  ]);
+  const [globalChatMessages, setGlobalChatMessages] = useState<ChatMessage[]>([]);
+
+  // Ability-related modal dialogs
+  const [isTorpedoLaunchDialogOpen, setIsTorpedoLaunchDialogOpen] = useState<boolean>(false);
 
   // This will run once after the main component mounts.
   // In dev mode, the main component is mounted, unmounted, then mounted again.
@@ -87,6 +82,25 @@ const App = () => {
     };
   }, []);
 
+  const isAbilityReady = (ability: Ability): boolean => {
+    const abilityData = gameState.teams[playerState.teamId].abilities[ability];
+    return abilityData.readiness === abilityData.readinessThreshold;
+
+  }
+
+  const onActivateAbilityClick = (ability: Ability) => {
+    switch(ability) {
+      case Ability.Torpedo:
+        console.log(gameState.teams[playerState.teamId]);
+        if (isAbilityReady(ability)) {
+          setIsTorpedoLaunchDialogOpen(true);
+        }
+        break;
+      default:
+        socket.emit(SocketEvents.activateAbility, playerState.teamId, ability);
+    }
+  }
+
   return (
     <>
       <div className="main-div">
@@ -110,10 +124,7 @@ const App = () => {
                   (ability: Ability) => 
                     socket.emit(SocketEvents.chargeAbility, playerState.teamId, ability)
                 }
-                onActivateClick={
-                  (ability: Ability) => 
-                    socket.emit(SocketEvents.activateAbility, playerState.teamId, ability)
-                }
+                onActivateClick={onActivateAbilityClick}
               />
               :
               null
@@ -182,6 +193,7 @@ const App = () => {
           <RadioMessages messages={radioMessages} />
         </div>
       </div>
+
       <div>
         <GlobalChat 
           messages={globalChatMessages} 
@@ -190,6 +202,15 @@ const App = () => {
           }
         />
       </div>
+
+      <TorpedoLaunchDialog 
+        isOpen={isTorpedoLaunchDialogOpen}
+        onSubmit={(launchCoordinates: Point) => {
+          socket.emit(SocketEvents.launchTorpedo, launchCoordinates);
+          setIsTorpedoLaunchDialogOpen(false);
+        }}
+        onClose={() => setIsTorpedoLaunchDialogOpen(false)}
+      />
     </>
   );
 };

@@ -1,4 +1,13 @@
-import { CIRCUIT_SELF_HEAL_THRESHOLD, DRONES_READINESS_THRESHOLD, GRID_SIZE, MINES_READINESS_THRESHOLD, SILENCE_READINESS_THRESHOLD, SONAR_READINESS_THRESHOLD, STARTING_SUB_HEALTH, TORPEDO_READINESS_THRESHOLD } from "../../../shared/constants.mjs";
+import {
+    GRID_SIZE,
+    CIRCUIT_SELF_HEAL_THRESHOLD,
+    DRONES_READINESS_THRESHOLD,
+    MINES_READINESS_THRESHOLD,
+    SILENCE_READINESS_THRESHOLD,
+    SONAR_READINESS_THRESHOLD,
+    STARTING_SUB_HEALTH,
+    TORPEDO_READINESS_THRESHOLD
+} from "../../../shared/constants.mjs";
 import { Ability, Direction, GridCell, SubSystem } from "../../../shared/enums.mjs";
 import { Point } from "../../../shared/types.js";
 import EngSystemNode from "./EngSystemNode.js";
@@ -263,7 +272,11 @@ class ClientState implements IClientState {
 
     // TODO: this is a placeholder!
     activateAbility(ability: Ability): void {
-        this.abilities[ability].readiness = 0;
+        const abilityData = this.abilities[ability];
+        if (abilityData.readiness !== abilityData.readinessThreshold)
+            return;
+
+        abilityData.readiness = 0;
         console.log("Ability reset: ", ability);
     }
 

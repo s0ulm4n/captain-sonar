@@ -1,0 +1,42 @@
+.modal {
+    background-color: #1a1a1a;
+    color: #00ff00;
+}
+
+.modal::backdrop {
+    backdrop-filter: blur(1px) contrast(0.5);
+}
+
+.close-button {
+    position: absolute;
+    padding: 0;
+    height: 16px;
+    width: 16px;
+    top: 2px;
+    right: 2px;
+}
+
+.modal-header {
+    padding-bottom: 5px;
+}
+
+.modal-form-element {
+    padding: 5px;
+}
+
+.modal-form-input {
+    background-color: #1a1a1a;
+    color: #00ff00;
+    border: 2px solid #00ff00;
+    font-family: "Share Tech Mono", "Courier New", monospace;
+    font-size: medium;
+    width: 25%;
+}
+
+.modal-action-button {
+    padding: 10px;
+    margin-top: 10px;
+    border: 2px solid #ff0000;
+    color: #ff0000;
+    width: 80%;
+}

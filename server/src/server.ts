@@ -5,7 +5,7 @@ import { Ability, Direction, PlayerRole, SocketEvents } from "../../shared/enums
 import GameState from "./game/GameState.js";
 import { IPlayerState } from "../../shared/interfaces.mjs";
 import RadioMessages from "./game/RadioMessages.js";
-import { ChatMessage } from "../../shared/types.js";
+import { ChatMessage, Point } from "../../shared/types.js";
 import { GLOBAL_CHAT_MESSAGES_LIMIT } from "../../shared/constants.mjs";
 
 /* Setup the server and init socket.io */
@@ -173,7 +173,7 @@ io.on("connection", (socket) => {
 
     socket.on(SocketEvents.sendMessageToChat, (from: string, message: string) => {
         console.log("New chat message");
-        console.log("From: ", from, "; Message: ", message);
+        console.log("From:", from, "; Message:", message);
 
         globalChat.push({
             from: from,
@@ -185,6 +185,10 @@ io.on("connection", (socket) => {
         }
 
         io.emit(SocketEvents.updateGlobalChat, globalChat);
+    });
+
+    socket.on(SocketEvents.launchTorpedo, (launchCoordinates: Point) => {
+        console.log("Torpedo launch triggered! Target:", launchCoordinates);
     });
 
     socket.on("disconnect", () => {
