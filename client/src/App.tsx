@@ -12,6 +12,7 @@ import RadioMessages from "./components/RadioMessages";
 import { ChatMessage, Point } from "../../shared/types.mts";
 import GlobalChat from "./components/GlobalChat";
 import TorpedoLaunchDialog from "./components/modals/TorpedoLaunchDialog";
+import RoleSwitcher from "./components/RoleSwitcher";
 
 const App = () => {
   const [gameState, setGameState] = useState<IGameState>({
@@ -23,6 +24,9 @@ const App = () => {
     teamId: -1,
     role: PlayerRole.NONE,
   })
+  // This is different from playerState.role
+  const [devModeSelectedRole, setDevModeSelectedRole] = 
+    useState<PlayerRole>(PlayerRole.NONE);
   const [radioMessages, setRadioMessages] = useState<string[]>([]);
   const [globalChatMessages, setGlobalChatMessages] = useState<ChatMessage[]>([]);
 
@@ -53,6 +57,9 @@ const App = () => {
       console.log("Client received player state:");
       console.log(newPlayerState);
       setPlayerState(newPlayerState);
+      if (newPlayerState.role === PlayerRole.DEV_MODE) {
+        setDevModeSelectedRole(PlayerRole.Captain);
+      }
     }
     const onUpdateGameState = (newGameState: IGameState) => {
       console.log("Client received game state:");
@@ -113,10 +120,16 @@ const App = () => {
 
   return (
     <>
+      <div>
+        <RoleSwitcher selectedRole={devModeSelectedRole} setRole={setDevModeSelectedRole} />
+      </div>
       <div className="main-div">
         <div 
           className="ability-board" 
-          hidden={playerState.role !== PlayerRole.FirstMate && playerState.role !== PlayerRole.DEV_MODE}
+          hidden={
+            playerState.role !== PlayerRole.FirstMate && 
+            !(playerState.role === PlayerRole.DEV_MODE && devModeSelectedRole === PlayerRole.FirstMate)
+          }
         >
           <div>
             {
@@ -142,7 +155,10 @@ const App = () => {
         </div>
         <div 
           className="eng-board"
-          hidden={playerState.role !== PlayerRole.Engineer && playerState.role !== PlayerRole.DEV_MODE}
+          hidden={
+            playerState.role !== PlayerRole.Engineer && 
+            !(playerState.role === PlayerRole.DEV_MODE && devModeSelectedRole === PlayerRole.Engineer)
+          }
         >
           <div>
             {
@@ -166,7 +182,10 @@ const App = () => {
         </div>
         <div 
           className="move-grid"
-          hidden={playerState.role !== PlayerRole.Captain && playerState.role !== PlayerRole.DEV_MODE}
+          hidden={
+            playerState.role !== PlayerRole.Captain && 
+            !(playerState.role === PlayerRole.DEV_MODE && devModeSelectedRole === PlayerRole.Captain)
+          }
         >
           <div>
             {
@@ -200,7 +219,13 @@ const App = () => {
             onSubmergeClick={() => socket.emit(SocketEvents.submerge, playerState.teamId)}
           />
         </div>
-        <div className="radio">
+        <div 
+          className="radio"
+          hidden={
+            playerState.role !== PlayerRole.RadioOperator && 
+            !(playerState.role === PlayerRole.DEV_MODE && devModeSelectedRole === PlayerRole.RadioOperator)
+          }
+        >
           <RadioMessages messages={radioMessages} />
         </div>
       </div>

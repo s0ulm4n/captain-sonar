@@ -30,7 +30,7 @@ Milestones:
 
 ~~13) Implement mine and torpedo ability activation.~~
 
-14) Implement sonar and drones ability actuvation.
+14) Add a DEV MODE only component that allows you to select which role to play as
 
 Tech debt:
 
