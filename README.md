@@ -26,7 +26,11 @@ Milestones:
 
 ~~11) Add global chat.~~
 
-12) Add a modal dialog component to handle abilities activation.
+~~12) Add a modal dialog component to handle abilities activation.~~
+
+~~13) Implement mine and torpedo ability activation.~~
+
+14) Implement sonar and drones ability actuvation.
 
 Tech debt:
 
@@ -35,3 +39,5 @@ Tech debt:
 2) How to handle a situation when the captain orders a move, but the first mate can't charge any systems because they are all already fully charged.
 
 3) The "team" should definitely be its own object capable of handling adding and removing players.
+
+4) The captain should have the ability to detonate mines.

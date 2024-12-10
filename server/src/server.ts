@@ -5,7 +5,7 @@ import { Ability, Direction, PlayerRole, SocketEvents } from "../../shared/enums
 import GameState from "./game/GameState.js";
 import { IPlayerState } from "../../shared/interfaces.mjs";
 import RadioMessages from "./game/RadioMessages.js";
-import { ChatMessage, Point } from "../../shared/types.js";
+import { ChatMessage, Point } from "../../shared/types.mjs";
 import { GLOBAL_CHAT_MESSAGES_LIMIT } from "../../shared/constants.mjs";
 
 /* Setup the server and init socket.io */
@@ -161,15 +161,49 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on(SocketEvents.activateAbility, (teamId: number, ability: Ability) => {
-        console.log("Received activate ability (" + ability + ") event from team " + teamId);
+    socket.on(SocketEvents.deployMine, (teamId: number) => {
+        console.log("Received deploy mine event from team " + teamId);
         const team = gameState.teams[teamId];
 
-        if (team) {
-            team.activateAbility(ability);
+        if (team && team.isAbilityReady(Ability.Mines)) {
+            const result = team.deployMine();
+            if (result.success) {
+                team.resetAbility(Ability.Mines);
+                io.emit(SocketEvents.updateGameState, gameState);
+            }
+        }
+    });
+
+    socket.on(SocketEvents.launchTorpedo, (teamId: number, target: Point) => {
+        console.log("Received launch torpedo event from team " + teamId);
+        const team = gameState.teams[teamId];
+
+        if (team && team.isAbilityReady(Ability.Torpedo)) {
+            const otherTeam = gameState.teams[1 - teamId];
+
+            // Both submarines can be damaged by a torpedo!
+            team.handleExplosion(target);
+            otherTeam.handleExplosion(target);
+
+            team.resetAbility(Ability.Torpedo);
             io.emit(SocketEvents.updateGameState, gameState);
         }
     });
+
+    // TODO: this is placeholder and needs to be removed
+    socket.on(
+        SocketEvents.activateAbility,
+        (teamId: number, ability: Ability, target: Point | number | null) => {
+            console.log("Received activate ability (" + ability + ") event from team " + teamId);
+            // const team = gameState.teams[teamId];
+
+            // if (team) {
+            //     const result = team.activateAbility(ability, target);
+            //     if (result.success) {
+            //         io.emit(SocketEvents.updateGameState, gameState);
+            //     }
+            // }
+        });
 
     socket.on(SocketEvents.sendMessageToChat, (from: string, message: string) => {
         console.log("New chat message");

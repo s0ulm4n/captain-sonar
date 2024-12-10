@@ -1,19 +1,16 @@
 import { GRID_SIZE } from "../../../../shared/constants.mts";
-import type { Point } from "../../../../shared/types";
+import type { Point } from "../../../../shared/types.mts";
 import { GridCell } from "../../../../shared/enums.mts";
 
 type Props = {
     grid: GridCell[][],
     subPosition: Point,
     subRoute: Point[],
+    mines: Point[],
 };
 
-const Grid = ({ grid, subPosition, subRoute }: Props) => {
+const Grid = ({ grid, subPosition, subRoute, mines }: Props) => {
     const output: string[][] = [];
-
-    // console.log("Rendering grid");
-    // console.log(grid);
-    // console.log(subPosition);
 
     if (grid && subPosition) {
         for (let y = 0; y < GRID_SIZE; y++) {
@@ -35,6 +32,10 @@ const Grid = ({ grid, subPosition, subRoute }: Props) => {
         subRoute.forEach(cell => {
             output[cell.y][cell.x] = 'x';
         });
+
+        mines.forEach(cell => {
+            output[cell.y][cell.x] = 'M';
+        })
 
         output[subPosition.y][subPosition.x] = '@';
     }

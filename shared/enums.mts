@@ -55,5 +55,6 @@ export const enum SocketEvents {
     chargeAbility = "chargeAbility",
     activateAbility = "activateAbility",
     sendMessageToChat = "sendMessageToChat",
+    deployMine = "deployMine",
     launchTorpedo = "launchTorpedo",
 };

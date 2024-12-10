@@ -1,5 +1,5 @@
 import { Ability, Direction, GridCell, PlayerRole, SubSystem } from "./enums.mjs";
-import { Point } from "./types.js";
+import { Point } from "./types.mjs";
 
 export interface IGameState {
     grid: GridCell[][],
@@ -47,6 +47,8 @@ export interface IClientState {
     // over the threshold, and once the threshold is reached the ability can be
     // used.
     abilities: { [id: string]: ISubAbility; },
+    // List of mines deployed by this team.
+    mines: Point[],
 }
 
 export interface IEngSystemNode {

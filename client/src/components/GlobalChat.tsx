@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { ChatMessage } from "../../../shared/types";
+import { ChatMessage } from "../../../shared/types.mts";
 
 type Props = {
     messages: ChatMessage[],
@@ -15,7 +15,7 @@ const GlobalChat = ({ messages, sendMessageHandler }: Props) => {
             sendMessageHandler(inputRef.current.value);
             inputRef.current.value = "";
         }
-    }
+    };
 
     const messageElements = messages.map((message) => <div>
         <strong>{message.from}: </strong>

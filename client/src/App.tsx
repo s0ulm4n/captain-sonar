@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import './App.css';
+import "./App.css";
 import { IGameState, IPlayerState } from "../../shared/interfaces.mts";
 import Grid from "./components/movement/Grid";
 import MovementControls from "./components/movement/MovementControls";
@@ -9,7 +9,7 @@ import { socket } from "./main";
 import EngineerBoard from "./components/engineer/EngineerBoard";
 import SubAbilitiesBoard from "./components/abilities/SubAbilitiesBoard";
 import RadioMessages from "./components/RadioMessages";
-import { ChatMessage, Point } from "../../shared/types";
+import { ChatMessage, Point } from "../../shared/types.mts";
 import GlobalChat from "./components/GlobalChat";
 import TorpedoLaunchDialog from "./components/modals/TorpedoLaunchDialog";
 
@@ -89,15 +89,25 @@ const App = () => {
   }
 
   const onActivateAbilityClick = (ability: Ability) => {
-    switch(ability) {
-      case Ability.Torpedo:
-        console.log(gameState.teams[playerState.teamId]);
-        if (isAbilityReady(ability)) {
+    console.log("poof");
+    if (isAbilityReady(ability)) {
+      console.log("ready");
+      switch(ability) {
+        case Ability.Mines:
+          // When activating the mine ability, we just need to send a signal
+          // to the server. The server will handle checking if we are able to
+          // place the mine and actually doing so.
+          socket.emit(SocketEvents.deployMine, playerState.teamId);
+          break;
+        case Ability.Torpedo:
+          // When activating the torpedo ability, we need to open the torpedo
+          // modal dialog. The dialog will then handle sending the message to the
+          // server.
           setIsTorpedoLaunchDialogOpen(true);
-        }
-        break;
-      default:
-        socket.emit(SocketEvents.activateAbility, playerState.teamId, ability);
+          break;
+        default:
+          socket.emit(SocketEvents.activateAbility, playerState.teamId, ability);
+      }
     }
   }
 
@@ -172,6 +182,7 @@ const App = () => {
                 grid={gameState.grid}
                 subPosition={gameState.teams[playerState.teamId].subPosition}
                 subRoute={gameState.teams[playerState.teamId].subRoute}
+                mines={gameState.teams[playerState.teamId].mines}
               />
               :
               null
@@ -206,7 +217,7 @@ const App = () => {
       <TorpedoLaunchDialog 
         isOpen={isTorpedoLaunchDialogOpen}
         onSubmit={(launchCoordinates: Point) => {
-          socket.emit(SocketEvents.launchTorpedo, launchCoordinates);
+          socket.emit(SocketEvents.launchTorpedo, playerState.teamId, launchCoordinates);
           setIsTorpedoLaunchDialogOpen(false);
         }}
         onClose={() => setIsTorpedoLaunchDialogOpen(false)}

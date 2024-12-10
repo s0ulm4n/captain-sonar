@@ -9,7 +9,7 @@ import {
     TORPEDO_READINESS_THRESHOLD
 } from "../../../shared/constants.mjs";
 import { Ability, Direction, GridCell, SubSystem } from "../../../shared/enums.mjs";
-import { Point } from "../../../shared/types.js";
+import { Point } from "../../../shared/types.mjs";
 import EngSystemNode from "./EngSystemNode.js";
 import { IClientState, ISubAbility } from "../../../shared/interfaces.mjs";
 import SubAbility from "./SubAbility.js";
@@ -31,19 +31,17 @@ class ClientState implements IClientState {
         radioCallback: () => void,
     } | null;
     abilities: { [id: string]: ISubAbility; };
+    mines: Point[];
 
     constructor(teamId: number, xPos: number, yPos: number) {
         this.teamId = teamId;
-        this.subPosition = {
-            x: xPos,
-            y: yPos,
-        };
-
+        this.subPosition = new Point(xPos, yPos);
         this.isSurfaced = false;
         this.subRoute = [];
         this.subHealth = STARTING_SUB_HEALTH;
         this.systemBreakages = {};
         this.pendingMove = null;
+        this.mines = [];
 
         this.initEngSystemNodeGroups();
         this.initSubAbilities();
@@ -93,11 +91,8 @@ class ClientState implements IClientState {
                 break;
         }
 
-        const oldSubPos = this.subPosition;
-        const newSubPos = {
-            x: oldSubPos.x + dx,
-            y: oldSubPos.y + dy,
-        };
+        const oldSubPos: Point = this.subPosition;
+        const newSubPos: Point = new Point(oldSubPos.x + dx, oldSubPos.y + dy);
 
         // Don't fall off the map
         if (
@@ -270,14 +265,58 @@ class ClientState implements IClientState {
         console.log("New ability readiness: ", this.abilities[ability].readiness);
     }
 
-    // TODO: this is a placeholder!
-    activateAbility(ability: Ability): void {
-        const abilityData = this.abilities[ability];
-        if (abilityData.readiness !== abilityData.readinessThreshold)
-            return;
+    resetAbility(ability: Ability): void {
+        this.abilities[ability].readiness = 0;
+    }
 
-        abilityData.readiness = 0;
-        console.log("Ability reset: ", ability);
+    isAbilityReady(ability: Ability): boolean {
+        const abilityData = this.abilities[ability];
+        return abilityData.readiness === abilityData.readinessThreshold;
+    }
+
+    deployMine(): {
+        success: boolean,
+        message: string,
+    } {
+        if (this.mines.find((pos: Point) => this.subPosition.equals(pos))) {
+            // Can't deploy a mine on top of an already deployed one.
+            return {
+                success: false,
+                message: `Mine already present at position ${this.subPosition}`
+            };
+        }
+
+        this.mines.push(this.subPosition);
+        return {
+            success: true,
+            message: "",
+        };
+    }
+
+    // TODO: this is a placeholder!
+    activateAbility(ability: Ability, callback: () => void, target: Point | number | null): void {
+        const abilityData = this.abilities[ability];
+        if (abilityData.readiness !== abilityData.readinessThreshold) {
+            console.log(`Ability ${ability} is not ready!`);
+            return;
+        }
+    }
+
+    removeMine(pos: Point): void {
+        this.mines = this.mines.filter((mine: Point) => !mine.equals(pos));
+    }
+
+    handleExplosion(center: Point): void {
+        // Check for submarine damage
+        if (this.subPosition.equals(center)) {
+            this.subHealth -= 2;
+        } else if (Math.abs(this.subPosition.x - center.x) <= 1 &&
+            Math.abs(this.subPosition.y - center.y) <= 1) {
+            this.subHealth -= 1;
+        }
+
+        // If there was a mine at the center of the explosion - remove it
+        this.removeMine(center);
     }
 
     /** Private helpers **/
@@ -341,18 +380,14 @@ class ClientState implements IClientState {
         this.circuitBreakages = [0, 0, 0];
     }
 
+    /**
+     * Checking if a sub can enter a particular cell.
+     * Assumes the sub can move in general (not surfaced).
+     */
     private isValidMove(grid: GridCell[][], newSubPos: Point): {
         isValid: boolean,
         message: string,
     } {
-        // Can't move if surfaced
-        if (this.isSurfaced) {
-            return {
-                isValid: false,
-                message: "Can't move when surfaced!",
-            };
-        }
-
         let { x, y } = newSubPos;
 
         const debugCoords = "(" + + x + ", " + y + ")";
@@ -375,10 +410,20 @@ class ClientState implements IClientState {
 
         // Can't cross own route
         for (const cell of this.subRoute) {
-            if (cell.x === x && cell.y === y) {
+            if (cell.equals(newSubPos)) {
                 return {
                     isValid: false,
                     message: "Sub can't cross its route " + debugCoords,
+                };
+            }
+        };
+
+        // Can't move onto own mines
+        for (const mine of this.mines) {
+            if (mine.equals(newSubPos)) {
+                return {
+                    isValid: false,
+                    message: "Sub can't move onto a mine " + debugCoords,
                 };
             }
         };

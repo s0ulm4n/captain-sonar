@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import Modal from "./Modal";
-import { Point } from "../../../../shared/types";
+import { Point } from "../../../../shared/types.mts";
 import { GRID_SIZE } from "../../../../shared/constants.mts";
 
 type Props = {
@@ -9,9 +9,12 @@ type Props = {
     onClose: () => void;
 };
 
+// TODO: you shouldn't be able to launch a torpedo at a target more than 4
+// spaces away (doesn't have to be in a straight line, but the spaces aren't
+// counted diagonally).
 const TorpedoLaunchDialog = ({isOpen, onSubmit, onClose}: Props) => {
     const focusInputRef = useRef<HTMLInputElement | null>(null);
-    const [launchCoordinates, setLaunchCoordinates] = useState<Point>({x: 0, y: 0});
+    const [launchCoordinates, setLaunchCoordinates] = useState<Point>(new Point(0, 0));
 
     useEffect(() => {
         if (isOpen && focusInputRef.current) {
@@ -23,20 +26,32 @@ const TorpedoLaunchDialog = ({isOpen, onSubmit, onClose}: Props) => {
         }
       }, [isOpen]);
 
-      const handleInputChange = (
+      const handleXCoordChange = (
         event: React.ChangeEvent<HTMLInputElement>
       ): void => {
-        const { name, value } = event.target;
-        setLaunchCoordinates((prevCoords) => ({
-          ...prevCoords,
-          [name]: value,
-        }));
+        const newCoord = Number(event.target.value)
+        if (newCoord) {
+            setLaunchCoordinates(
+                (prevCoords) =>  new Point(newCoord, prevCoords.y)
+            );
+        }
+      };
+
+      const handleYCoordChange = (
+        event: React.ChangeEvent<HTMLInputElement>
+      ): void => {
+        const newCoord = Number(event.target.value)
+        if (newCoord) {
+            setLaunchCoordinates(
+                (prevCoords) =>  new Point(prevCoords.x, newCoord)
+            );
+        }
       };
       
       const handleSubmit = (event: React.FormEvent): void => {
         event.preventDefault();
         onSubmit(launchCoordinates);
-        setLaunchCoordinates({x: 0, y: 0});
+        setLaunchCoordinates(new Point(0, 0));
       };
 
     return (
@@ -55,7 +70,7 @@ const TorpedoLaunchDialog = ({isOpen, onSubmit, onClose}: Props) => {
                         id="x-coord"
                         name="x"
                         value={launchCoordinates.x}
-                        onChange={handleInputChange}
+                        onChange={handleXCoordChange}
                         required
                     />
                 </div>
@@ -69,7 +84,7 @@ const TorpedoLaunchDialog = ({isOpen, onSubmit, onClose}: Props) => {
                         max={GRID_SIZE - 1}
                         name="y"
                         value={launchCoordinates.y}
-                        onChange={handleInputChange}
+                        onChange={handleYCoordChange}
                         required
                     />
                 </div>
