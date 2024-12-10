@@ -1,3 +1,5 @@
+import "./SubAbilityControls.css"
+
 type Props = {
     name: string,
     threshold: number,
@@ -10,7 +12,9 @@ type Props = {
 const SubAbilityControls = ({name, threshold, readiness, isBroken, onChargeClick, onActivateClick}: Props) => {
     return (
     <div className="ability-controls-div">
-        <span>{name + ": " + readiness + "/" + threshold}</span>
+        <span className={isBroken ? "ability-name-broken" : ""}>
+            {`${name}: ${readiness}/${threshold}`}
+        </span>
         <button 
             className="animated-button charge-ability-button" 
             disabled={readiness === threshold}
@@ -19,7 +23,6 @@ const SubAbilityControls = ({name, threshold, readiness, isBroken, onChargeClick
         </button>
         <button 
             className="animated-button activate-ability-button"
-            // TODO: clearly indicate when the button is disabled
             disabled={isBroken || readiness < threshold}
             onClick={onActivateClick}>
             Activate
