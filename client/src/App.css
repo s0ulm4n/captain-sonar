@@ -58,8 +58,7 @@
 /** Grid/movement board **/
 
 .move-grid {
-  width: 40%;
-  /* background-color: rgba(0, 0, 0, 0.7); */
+  width: fit-content;
   border: 1px solid #00ff00;
   border-radius: 5px;
 }

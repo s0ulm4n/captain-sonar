@@ -1,16 +1,16 @@
 import { GRID_SIZE } from "../../../shared/constants.mjs";
-import { GridCell } from "../../../shared/enums.mjs";
+import { CellType } from "../../../shared/enums.mjs";
 import { IGameState } from "../../../shared/interfaces.mjs";
 import ClientState from "./ClientState.js";
 
 class GameState implements IGameState {
-    grid: GridCell[][];
+    grid: CellType[][];
     teams: ClientState[];
 
     constructor() {
         // The game area
         this.grid = Array.from({ length: GRID_SIZE }, () =>
-            new Array(GRID_SIZE).fill(GridCell.Water));
+            new Array(GRID_SIZE).fill(CellType.Water));
 
         // Initialize both teams, put their subs on the opposite sides of the grid.
         this.teams = [
@@ -27,7 +27,7 @@ class GameState implements IGameState {
                     && !(this.teams[0].subPosition.x === x && this.teams[1].subPosition.y === y)
                     && (Math.floor(Math.random() * 10) <= 1)
                 ) {
-                    this.grid[y][x] = GridCell.Land;
+                    this.grid[y][x] = CellType.Land;
                 }
             }
         }

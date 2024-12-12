@@ -1,0 +1,77 @@
+/* border-collapse allows setting borders for each cell and row individually */
+table {
+    border-collapse: collapse;
+    margin: 10px;
+}
+
+/* Each table row should have a right border */
+tr {
+    border-right: 1px solid hsl(120, 100%, 50%);
+}
+
+/* EXCEPT for the first row (the ABC... one) */
+tr:nth-child(1) {
+    border-right: unset;
+}
+
+/* Each cell should have a semi-transparent top and left border */
+td {
+    border-top: 1px solid hsl(120, 100%, 50%, 25%);
+    border-left: 1px solid hsl(120, 100%, 50%, 25%);
+    width: 24px;
+    height: 24px;
+}
+
+/* Except for the first cell in each row, which should have no border */
+td:nth-child(1) {
+    border: unset;
+}
+
+/* Every fifth cell in a row starting from the second one (so cells 2, 7, 12
+   in each row) should have a completely solid left border. This takes care of
+   the vertical borders between sectors. */
+td:nth-child(5n+2) {
+    border-left: 1px solid hsl(120, 100%, 50%);
+}
+
+/* Except for the cells in the top row, which should have no borders */
+tr:nth-child(1) td {
+    border: unset;
+}
+
+/* Every fifth row starting from the second one (again 2, 7, 12) should
+   have a completely solid top border - that takes care of horizontal borders
+   between sectors. */
+tr:nth-child(5n+2) td {
+    border-top: 1px solid hsl(120, 100%, 50%);
+}
+
+/* Except the first cell in these orders, which should have no borders (those
+   are the cells with the row number) */
+tr:nth-child(5n+2) td:nth-child(1) {
+    border: unset;
+}
+
+/* Finally, the cells in the LAST row should have a solid bottom border. */
+tr:nth-last-child(1) td {
+    border-bottom: 1px solid hsl(120, 100%, 50%);
+}
+
+/* EXCEPT for the first cell in that row, which should have no border. */
+tr:nth-last-child(1) td:nth-child(1) {
+    border: unset;
+}
+
+/* The reason the above CSS is so convoluted is that the more specific styles
+   override the less specific. So I couldn't just use "td:nth-child(1)" to style
+   the first cell in every row, because it would be overridden by 
+   "tr:nth-last-child(1) td". */
+
+/* Highlight cells when hovering above them */
+.strong-highlight {
+    background-color: hsl(0, 100%, 100%, 30%);
+}
+
+.weak-highlight {
+    background-color: hsl(0, 100%, 100%, 15%);
+}

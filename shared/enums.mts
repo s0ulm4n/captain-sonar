@@ -1,5 +1,5 @@
 // Possible grid cell values.
-export const enum GridCell {
+export const enum CellType {
     Water,
     Land,
 };

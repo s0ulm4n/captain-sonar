@@ -1,9 +1,9 @@
 import { GRID_SIZE } from "../../../../shared/constants.mts";
 import type { Point } from "../../../../shared/types.mts";
-import { GridCell } from "../../../../shared/enums.mts";
+import { CellType } from "../../../../shared/enums.mts";
 
 type Props = {
-    grid: GridCell[][],
+    grid: CellType[][],
     subPosition: Point,
     subRoute: Point[],
     mines: Point[],
@@ -18,7 +18,7 @@ const Grid = ({ grid, subPosition, subRoute, mines }: Props) => {
 
             for (let x = 0; x < GRID_SIZE; x++) {
                 {
-                    if (grid[y][x] === GridCell.Land) {
+                    if (grid[y][x] === CellType.Land) {
                         line.push('^');
                     } else {
                         line.push('.');

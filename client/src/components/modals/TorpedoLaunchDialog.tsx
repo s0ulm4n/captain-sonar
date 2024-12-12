@@ -28,7 +28,7 @@ const TorpedoLaunchDialog = ({isOpen, onSubmit, onClose}: Props) => {
 
       const handleXCoordChange = (
         event: React.ChangeEvent<HTMLInputElement>
-      ): void => {
+      ) => {
         const newCoord = Number(event.target.value)
         if (newCoord) {
             setLaunchCoordinates(
@@ -39,7 +39,7 @@ const TorpedoLaunchDialog = ({isOpen, onSubmit, onClose}: Props) => {
 
       const handleYCoordChange = (
         event: React.ChangeEvent<HTMLInputElement>
-      ): void => {
+      ) => {
         const newCoord = Number(event.target.value)
         if (newCoord) {
             setLaunchCoordinates(
@@ -48,7 +48,7 @@ const TorpedoLaunchDialog = ({isOpen, onSubmit, onClose}: Props) => {
         }
       };
       
-      const handleSubmit = (event: React.FormEvent): void => {
+      const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
         onSubmit(launchCoordinates);
         setLaunchCoordinates(new Point(0, 0));

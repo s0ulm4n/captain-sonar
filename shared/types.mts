@@ -10,8 +10,12 @@ export class Point {
         this.y = y;
     }
 
-    equals(other: Point) {
-        return this.x === other.x && this.y === other.y;
+    equals(other: Point): boolean {
+        return this.equalsCoord(other.x, other.y);
+    }
+
+    equalsCoord(x: number, y: number): boolean {
+        return this.x === x && this.y === y;
     }
 };
 

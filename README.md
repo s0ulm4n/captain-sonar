@@ -30,7 +30,9 @@ Milestones:
 
 ~~13) Implement mine and torpedo ability activation.~~
 
-14) Add a DEV MODE only component that allows you to select which role to play as
+~~14) Add a DEV MODE only component that allows you to select which role to play as.~~
+
+15) UI redesign: grid component
 
 Tech debt:
 
@@ -41,3 +43,15 @@ Tech debt:
 3) The "team" should definitely be its own object capable of handling adding and removing players.
 
 4) The captain should have the ability to detonate mines.
+
+5) Display the enemy sub on the grid when it's surfaced.
+
+Assets:
+
+- Island SVG: https://www.svgrepo.com/svg/2812/island
+
+- Submarine SVG: https://www.svgrepo.com/svg/252982/submarine
+
+- X SVG: https://iconmonstr.com/x-mark-1-svg/
+
+- Mine SVG: https://www.svgrepo.com/svg/143263/depth-charge

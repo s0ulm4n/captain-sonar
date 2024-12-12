@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import { IGameState, IPlayerState } from "../../shared/interfaces.mts";
-import Grid from "./components/movement/Grid";
 import MovementControls from "./components/movement/MovementControls";
 import { Ability, Direction, PlayerRole, SocketEvents } from "../../shared/enums.mts";
 import SurfacingControls from "./components/movement/SurfacingControls";
@@ -13,6 +12,7 @@ import { ChatMessage, Point } from "../../shared/types.mts";
 import GlobalChat from "./components/GlobalChat";
 import TorpedoLaunchDialog from "./components/modals/TorpedoLaunchDialog";
 import RoleSwitcher from "./components/RoleSwitcher";
+import GridV2 from "./components/grid/GridV2";
 
 const App = () => {
   const [gameState, setGameState] = useState<IGameState>({
@@ -197,8 +197,14 @@ const App = () => {
           <div>You&apos;re on team {playerState.teamId + 1}</div>
           {
             gameState.teams[playerState.teamId] ?
-              <Grid
-                grid={gameState.grid}
+              // <Grid
+              //   grid={gameState.grid}
+              //   subPosition={gameState.teams[playerState.teamId].subPosition}
+              //   subRoute={gameState.teams[playerState.teamId].subRoute}
+              //   mines={gameState.teams[playerState.teamId].mines}
+              // />
+              <GridV2
+                  grid={gameState.grid}
                 subPosition={gameState.teams[playerState.teamId].subPosition}
                 subRoute={gameState.teams[playerState.teamId].subRoute}
                 mines={gameState.teams[playerState.teamId].mines}

@@ -1,8 +1,8 @@
-import { Ability, Direction, GridCell, PlayerRole, SubSystem } from "./enums.mjs";
+import { Ability, Direction, CellType, PlayerRole, SubSystem } from "./enums.mjs";
 import { Point } from "./types.mjs";
 
 export interface IGameState {
-    grid: GridCell[][],
+    grid: CellType[][],
     teams: IClientState[],
 }
 

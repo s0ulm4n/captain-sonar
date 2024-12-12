@@ -8,7 +8,7 @@ import {
     STARTING_SUB_HEALTH,
     TORPEDO_READINESS_THRESHOLD
 } from "../../../shared/constants.mjs";
-import { Ability, Direction, GridCell, SubSystem } from "../../../shared/enums.mjs";
+import { Ability, Direction, CellType, SubSystem } from "../../../shared/enums.mjs";
 import { Point } from "../../../shared/types.mjs";
 import EngSystemNode from "./EngSystemNode.js";
 import { IClientState, ISubAbility } from "../../../shared/interfaces.mjs";
@@ -54,7 +54,7 @@ class ClientState implements IClientState {
      * Validate a move order and record it as pending if it's valid.
      */
     tryMoveSub(
-        grid: GridCell[][],
+        grid: CellType[][],
         dir: Direction,
         radioCallback: () => void,
     ): {
@@ -384,7 +384,7 @@ class ClientState implements IClientState {
      * Checking if a sub can enter a particular cell.
      * Assumes the sub can move in general (not surfaced).
      */
-    private isValidMove(grid: GridCell[][], newSubPos: Point): {
+    private isValidMove(grid: CellType[][], newSubPos: Point): {
         isValid: boolean,
         message: string,
     } {
@@ -393,7 +393,7 @@ class ClientState implements IClientState {
         const debugCoords = "(" + + x + ", " + y + ")";
 
         // Can't move into cells that aren't water
-        if (grid[y][x] != GridCell.Water) {
+        if (grid[y][x] != CellType.Water) {
             return {
                 isValid: false,
                 message: "Destination cell is land " + debugCoords,
