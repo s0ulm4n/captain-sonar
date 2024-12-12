@@ -1,0 +1,34 @@
+.global-chat {
+    text-align: left;
+    border: 1px solid #00ff00;
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px;
+    width: 400px;
+}
+
+.global-chat-messages {
+    height: 200px;
+    overflow-y: scroll;
+    scrollbar-color: #00ff00 black;
+}
+
+.timestamp {
+    float: right;
+}
+
+.message-input {
+    width: 75%;
+    background-color: black;
+    color: #00ff00;
+    font-family: inherit;
+}
+
+.send-button {
+    width: 20%;
+    float: right;
+}
+
+hr {
+    border-color: inherit;
+}

@@ -1,3 +1,4 @@
+import "./MovementControls.css";
 import { Direction } from "../../../../shared/enums.mts";
 
 type Props = {
@@ -9,7 +10,7 @@ const MovementControls = ({ onClick }: Props) => {
         <>
             <div>
                 <button 
-                    className="animated-button direction-button" 
+                    className="animated-button light-button-theme direction-button" 
                     onClick={() => onClick(Direction.North)}
                 >
                     N
@@ -17,13 +18,13 @@ const MovementControls = ({ onClick }: Props) => {
             </div>
             <div>
                 <button 
-                    className="animated-button direction-button" 
+                    className="animated-button light-button-theme direction-button" 
                     onClick={() => onClick(Direction.West)}
                 >
                     W
                 </button>
                 <button 
-                    className="animated-button direction-button" 
+                    className="animated-button light-button-theme direction-button" 
                     onClick={() => onClick(Direction.East)}
                 >
                     E
@@ -31,7 +32,7 @@ const MovementControls = ({ onClick }: Props) => {
             </div>
             <div>
                 <button 
-                    className="animated-button direction-button" 
+                    className="animated-button light-button-theme direction-button" 
                     onClick={() => onClick(Direction.South)}
                 >
                     S

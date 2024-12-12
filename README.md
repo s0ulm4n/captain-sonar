@@ -32,7 +32,9 @@ Milestones:
 
 ~~14) Add a DEV MODE only component that allows you to select which role to play as.~~
 
-15) UI redesign: grid component
+~~15) UI redesign: grid component~~
+
+16) UI redesign: chat component
 
 Tech debt:
 

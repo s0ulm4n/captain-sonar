@@ -9,7 +9,7 @@ import EngineerBoard from "./components/engineer/EngineerBoard";
 import SubAbilitiesBoard from "./components/abilities/SubAbilitiesBoard";
 import RadioMessages from "./components/RadioMessages";
 import { ChatMessage, Point } from "../../shared/types.mts";
-import GlobalChat from "./components/GlobalChat";
+import GlobalChat from "./components/chat/GlobalChat";
 import TorpedoLaunchDialog from "./components/modals/TorpedoLaunchDialog";
 import RoleSwitcher from "./components/RoleSwitcher";
 import GridV2 from "./components/grid/GridV2";
@@ -92,7 +92,6 @@ const App = () => {
   const isAbilityReady = (ability: Ability): boolean => {
     const abilityData = gameState.teams[playerState.teamId].abilities[ability];
     return abilityData.readiness === abilityData.readinessThreshold;
-
   }
 
   const onActivateAbilityClick = (ability: Ability) => {
@@ -225,6 +224,14 @@ const App = () => {
             onSubmergeClick={() => socket.emit(SocketEvents.submerge, playerState.teamId)}
           />
         </div>
+        <div>
+          <GlobalChat 
+            messages={globalChatMessages} 
+            sendMessageHandler={(message: string) => 
+              socket.emit(SocketEvents.sendMessageToChat, playerState.role, message, Date.now())
+            }
+          />
+        </div>
         <div 
           className="radio"
           hidden={
@@ -234,15 +241,6 @@ const App = () => {
         >
           <RadioMessages messages={radioMessages} />
         </div>
-      </div>
-
-      <div>
-        <GlobalChat 
-          messages={globalChatMessages} 
-          sendMessageHandler={(message: string) => 
-            socket.emit(SocketEvents.sendMessageToChat, playerState.id, message)
-          }
-        />
       </div>
 
       <TorpedoLaunchDialog 

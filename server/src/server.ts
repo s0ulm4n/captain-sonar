@@ -205,13 +205,14 @@ io.on("connection", (socket) => {
             // }
         });
 
-    socket.on(SocketEvents.sendMessageToChat, (from: string, message: string) => {
+    socket.on(SocketEvents.sendMessageToChat, (from: string, message: string, timestamp: number) => {
         console.log("New chat message");
         console.log("From:", from, "; Message:", message);
 
         globalChat.push({
             from: from,
             message: message,
+            timestamp: timestamp,
         });
 
         if (globalChat.length > GLOBAL_CHAT_MESSAGES_LIMIT) {

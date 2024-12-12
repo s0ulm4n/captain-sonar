@@ -25,4 +25,5 @@ export class Point {
 export type ChatMessage = {
     from: string,
     message: string,
+    timestamp: number,
 };
