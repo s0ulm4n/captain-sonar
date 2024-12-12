@@ -124,7 +124,7 @@ const App = () => {
       </div>
       <div className="main-div">
         <div 
-          className="ability-board" 
+          className="bordered-panel ability-board" 
           hidden={
             playerState.role !== PlayerRole.FirstMate && 
             !(playerState.role === PlayerRole.DEV_MODE && devModeSelectedRole === PlayerRole.FirstMate)
@@ -153,7 +153,7 @@ const App = () => {
           }
         </div>
         <div 
-          className="eng-board"
+          className="bordered-panel eng-board"
           hidden={
             playerState.role !== PlayerRole.Engineer && 
             !(playerState.role === PlayerRole.DEV_MODE && devModeSelectedRole === PlayerRole.Engineer)
@@ -180,7 +180,39 @@ const App = () => {
           }
         </div>
         <div 
-          className="move-grid"
+          className="bordered-panel movement-board"
+          hidden={
+            playerState.role !== PlayerRole.Captain && 
+            !(playerState.role === PlayerRole.DEV_MODE && devModeSelectedRole === PlayerRole.Captain)
+          }
+        >
+          <label>Movement Controls</label>
+          <MovementControls 
+            onClick={
+              (dir: Direction) => {
+                socket.emit(SocketEvents.tryMoveSub, playerState.teamId, dir);
+              }
+            }
+            teamId={playerState.teamId}
+            isDebugModeOn={playerState.role === PlayerRole.DEV_MODE}
+            isMovementEnabled={
+              gameState.teams[playerState.teamId] &&
+              gameState.teams[playerState.teamId].pendingMove === null &&
+              !gameState.teams[playerState.teamId].isSurfaced
+            }
+            pendingMoveDirection={gameState.teams[playerState.teamId]?.pendingMove?.dir ?? null}
+            pendingMoveEngAck={gameState.teams[playerState.teamId]?.pendingMove?.engineerAck ?? false}
+            pendingMoveFirstMateAck={gameState.teams[playerState.teamId]?.pendingMove?.firstMateAck ?? false}
+          />
+          <SurfacingControls
+            isSurfaced={gameState.teams[playerState.teamId]?.isSurfaced ?? false}
+            isEnabled={!gameState.teams[playerState.teamId]?.pendingMove}
+            onSurfaceClick={() => socket.emit(SocketEvents.surface, playerState.teamId)}
+            onSubmergeClick={() => socket.emit(SocketEvents.submerge, playerState.teamId)}
+          />
+        </div>
+        <div 
+          className="bordered-panel move-grid"
           hidden={
             playerState.role !== PlayerRole.Captain && 
             !(playerState.role === PlayerRole.DEV_MODE && devModeSelectedRole === PlayerRole.Captain)
@@ -211,18 +243,6 @@ const App = () => {
               :
               null
           }
-          <MovementControls onClick={(dir: Direction) => {
-            socket.emit(SocketEvents.tryMoveSub, playerState.teamId, dir);
-          }} />
-          <SurfacingControls
-            isSurfaced={
-              gameState.teams[playerState.teamId] 
-              ? gameState.teams[playerState.teamId].isSurfaced 
-              : false
-            }
-            onSurfaceClick={() => socket.emit(SocketEvents.surface, playerState.teamId)}
-            onSubmergeClick={() => socket.emit(SocketEvents.submerge, playerState.teamId)}
-          />
         </div>
         <div>
           <GlobalChat 

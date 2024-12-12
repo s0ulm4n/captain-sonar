@@ -1,16 +1,23 @@
+import "./SurfacingControls.css";
+
 type Props = {
     isSurfaced: boolean,
+    isEnabled: boolean,
     onSurfaceClick: () => void,
     onSubmergeClick: () => void,
 };
 
-const SurfacingControls = ({ isSurfaced, onSurfaceClick, onSubmergeClick }: Props) => {
+const SurfacingControls = ({ isSurfaced, isEnabled, onSurfaceClick, onSubmergeClick }: Props) => {
+    const surfaceClassName = 
+        `animated-button surface-submerge-button ${isEnabled ? "red-button-theme" : ""}`
+    const submergeClassName = surfaceClassName + " submerge-button-pulse";
+
     return isSurfaced ? (
-        <button className="animated-button surface-button" onClick={onSubmergeClick}>
+        <button className={submergeClassName} onClick={onSubmergeClick}>
             Submerge
         </button>
     ) : (
-        <button className="animated-button surface-button" onClick={onSurfaceClick}>
+        <button className={surfaceClassName} disabled={!isEnabled} onClick={onSurfaceClick}>
             Surface
         </button>
     );

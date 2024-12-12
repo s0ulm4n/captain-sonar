@@ -226,6 +226,18 @@ io.on("connection", (socket) => {
         console.log("Torpedo launch triggered! Target:", launchCoordinates);
     });
 
+    socket.on(SocketEvents.DEBUG_moveSub, (teamId: number) => {
+        console.log("DEBUG: pending move resolved by team ", teamId);
+        const team = gameState.teams[teamId];
+
+        if (team && team.pendingMove !== null) {
+            team.pendingMove.engineerAck = true;
+            team.pendingMove.firstMateAck = true;
+            team.moveSub();
+            io.emit(SocketEvents.updateGameState, gameState);
+        }
+    });
+
     socket.on("disconnect", () => {
         const player = players[socket.id];
         if (player) {

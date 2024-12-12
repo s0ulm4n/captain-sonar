@@ -22,7 +22,7 @@ const SubAbilityControls = ({name, threshold, readiness, isBroken, onChargeClick
             Charge
         </button>
         <button 
-            className="animated-button activate-ability-button"
+            className="animated-button red-button-theme activate-ability-button"
             disabled={isBroken || readiness < threshold}
             onClick={onActivateClick}>
             Activate

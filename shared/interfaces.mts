@@ -41,6 +41,8 @@ export interface IClientState {
     pendingMove: {
         coord: Point;
         dir: Direction;
+        engineerAck: boolean,
+        firstMateAck: boolean,
     } | null,
     // Submarine's abilities, including their corresponsing subsystem and the
     // ability's readiness threshold and current readiness. Readiness can't go

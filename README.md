@@ -34,7 +34,11 @@ Milestones:
 
 ~~15) UI redesign: grid component~~
 
-16) UI redesign: chat component
+~~16) UI redesign: chat component~~
+
+~~17) UI redesign: movement + surfacing components~~
+
+18) UI redesign: engineer board
 
 Tech debt:
 

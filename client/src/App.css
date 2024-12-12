@@ -36,6 +36,13 @@
 
 /** Common CSS **/
 
+.bordered-panel {
+  border: 1px solid #00ff00;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 5px;
+}
+
 .animated-button {
   background-color: #2a2a2a;
   border-radius: 5px;
@@ -66,14 +73,21 @@
   box-shadow: 0 0 15px rgba(0, 204, 255, 0.4);
 }
 
-/** Grid/movement board **/
+.red-button-theme {
+  border: 2px solid #ff0000;
+  color: #ff0000;
+}
+
+.red-button-theme:hover {
+  background-color: #ff0000;
+  color: #2a2a2a;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+}
+
+/** Grid **/
 
 .move-grid {
   width: fit-content;
-  border: 1px solid #00ff00;
-  border-radius: 5px;
-  padding: 5px;
-  margin: 5px;
 }
 
 .grid-line {
@@ -83,34 +97,10 @@
   letter-spacing: 2px;
 }
 
-.surface-button {
-  border: 2px solid #ff0000;
-  color: #ff0000;
-  padding: 15px 30px;
-  margin: 8px;
-  letter-spacing: 2px;
-  animation: pulse 2s infinite;
-}
+/** Movement controls **/
 
-/* Add pulsing effect to surface button */
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4);
-  }
-
-  70% {
-    box-shadow: 0 0 0 10px rgba(255, 0, 0, 0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 0, 0, 0);
-  }
-}
-
-.surface-button:hover {
-  background-color: #ff0000;
-  color: #2a2a2a;
-  box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
+.movement-board {
+  width: 20%;
 }
 
 /** Engineer board **/
@@ -118,8 +108,6 @@
 .eng-board {
   width: 40%;
   /* background-color: rgba(0, 0, 0, 0.7); */
-  border: 1px solid #00ff00;
-  border-radius: 5px;
 }
 
 .eng-board-button {
@@ -163,17 +151,6 @@
 .activate-ability-button {
   padding: 5px;
   margin: 5px;
-  border: 2px solid #ff0000;
-  color: #ff0000;
-
-  /* letter-spacing: 2px; */
-  /* animation: pulse 2s infinite; */
-}
-
-.activate-ability-button:hover {
-  background-color: #ff0000;
-  color: #2a2a2a;
-  box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
 }
 
 .ability-controls-div {
@@ -184,7 +161,4 @@
 .ability-board {
   width: 20%;
   padding: 10px 20px;
-  /* background-color: rgba(0, 0, 0, 0.7); */
-  border: 1px solid #00ff00;
-  border-radius: 5px;
 }

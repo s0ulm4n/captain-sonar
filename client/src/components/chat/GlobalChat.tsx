@@ -32,7 +32,7 @@ const GlobalChat = ({ messages, sendMessageHandler }: Props) => {
     </div>);
 
     return (
-        <div className="global-chat">
+        <div className="bordered-panel global-chat">
             <div className="global-chat-messages">
                 {messageElements}
             </div>

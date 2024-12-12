@@ -57,4 +57,6 @@ export const enum SocketEvents {
     sendMessageToChat = "sendMessageToChat",
     deployMine = "deployMine",
     launchTorpedo = "launchTorpedo",
+
+    DEBUG_moveSub = "DEBUG_moveSub",
 };

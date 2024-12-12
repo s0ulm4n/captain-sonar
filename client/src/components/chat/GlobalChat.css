@@ -1,9 +1,5 @@
 .global-chat {
     text-align: left;
-    border: 1px solid #00ff00;
-    border-radius: 5px;
-    padding: 5px;
-    margin: 5px;
     width: 400px;
 }
 
